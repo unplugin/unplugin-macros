@@ -2,7 +2,8 @@
 
 [![Unit Test](https://github.com/sxzz/unplugin-macros/actions/workflows/unit-test.yml/badge.svg)](https://github.com/sxzz/unplugin-macros/actions/workflows/unit-test.yml)
 
-WIP
+> Macros are a mechanism for running JavaScript functions at bundle-time.
+> The value returned from these functions are directly inlined into your bundle.
 
 ## Installation
 
@@ -78,6 +79,24 @@ module.exports = {
 ```
 
 <br></details>
+
+## Usage
+
+```js
+// main.js
+import { getRandom } from './macros' assert { type: 'macro' }
+
+getRandom()
+```
+
+```js
+// macros.js
+export function getRandom() {
+  return Math.random()
+}
+```
+
+See more in [Bun Macros](https://bun.sh/blog/bun-macros).
 
 ## Thanks
 
