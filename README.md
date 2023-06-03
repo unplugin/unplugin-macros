@@ -86,7 +86,7 @@ module.exports = {
 // main.js
 import { getRandom } from './macros' assert { type: 'macro' }
 
-getRandom()
+getRandom() // Will be replaced with a random number at build time
 ```
 
 ```js
