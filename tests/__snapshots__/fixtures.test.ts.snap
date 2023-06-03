@@ -1,0 +1,28 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`fixture > tests/fixtures/args.js 1`] = `
+"0 === 0;
+\\"1\\" === '1';
+false === false;
+null === null;
+undefined === undefined;
+"
+`;
+
+exports[`fixture > tests/fixtures/basic.js 1`] = `
+"0.5 === 0.5;
+1 === 1;
+2 === 2;
+3 === 3;
+"
+`;
+
+exports[`fixture > tests/fixtures/import-namespace.js 1`] = `
+"0.5 === 0.5;
+"
+`;
+
+exports[`fixture > tests/fixtures/nested-object.js 1`] = `
+"\\"foo\\" === 'foo';
+"
+`;
