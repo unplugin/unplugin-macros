@@ -1,0 +1,14 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`fixture > tests/fixtures/basic.js 1`] = `
+"0.5;
+1;
+2;
+3;
+0;
+1;
+false;
+null;
+undefined;
+"
+`;
