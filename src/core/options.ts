@@ -4,6 +4,12 @@ import type { FilterPattern } from '@rollup/pluginutils'
 export interface Options {
   include?: FilterPattern
   exclude?: FilterPattern
+  /**
+   * Available except Vite itself.
+   *
+   * For Vite, the current Vite instance and configuration will be used directly, so this option will be ignored.
+   * @see https://vitejs.dev/config/
+   */
   viteConfig?: InlineConfig
 }
 
