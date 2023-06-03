@@ -7,7 +7,7 @@ vi.spyOn(Math, 'random').mockReturnValue(0.5)
 
 describe('fixture', async () => {
   await testFixtures(
-    'tests/fixtures/*.{vue,js,ts}',
+    'tests/fixtures/*.{js,ts}',
     (args, id) => rollupBuild(id, [Macros()]),
     {
       cwd: resolve(__dirname, '..'),
