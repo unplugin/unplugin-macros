@@ -16,7 +16,8 @@ import type { ViteNodeRunner } from 'vite-node/client'
 export async function transformMacros(
   code: string,
   id: string,
-  runner: ViteNodeRunner
+  runner: ViteNodeRunner,
+  deps: Record<string, Set<string>>
 ) {
   const program = babelParse(code, id, {
     plugins: [['importAttributes', { deprecatedAssertSyntax: true }]],
@@ -39,7 +40,12 @@ export async function transformMacros(
         node.type === 'CallExpression' &&
         isTypeOf(node.callee, ['Identifier', 'MemberExpression'])
       ) {
-        const fn = resolveIdentifier(node.callee)
+        let fn: string[]
+        try {
+          fn = resolveIdentifier(node.callee)
+        } catch {
+          return
+        }
         if (!imports[fn[0]]) return
         const args = node.arguments.map((arg) => {
           if (isLiteralType(arg)) return resolveLiteral(arg)
@@ -57,6 +63,12 @@ export async function transformMacros(
     },
   })
 
+  if (macros.length === 0) {
+    delete deps[id]
+    return
+  }
+
+  deps[id] = new Set()
   for (const {
     node,
     fn: [local, ...keys],
@@ -80,6 +92,8 @@ export async function transformMacros(
 
     const ret = fn(...args)
     s.overwriteNode(node, ret === undefined ? 'undefined' : JSON.stringify(ret))
+
+    deps[id].add(resolved)
   }
 
   return getTransformResult(s, id)

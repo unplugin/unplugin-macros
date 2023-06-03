@@ -6,7 +6,7 @@ import { ViteNodeRunner } from 'vite-node/client'
 import { installSourcemapsSupport } from 'vite-node/source-map'
 import { resolveOptions } from './core/options'
 import { transformMacros } from './core'
-import type { ViteDevServer } from 'vite'
+import type { ModuleNode, ViteDevServer } from 'vite'
 import type { Options } from './core/options'
 
 export default createUnplugin<Options | undefined>((rawOptions = {}) => {
@@ -17,6 +17,8 @@ export default createUnplugin<Options | undefined>((rawOptions = {}) => {
   let server: ViteDevServer
   let node: ViteNodeServer
   let runner: ViteNodeRunner
+
+  const deps: Record<string, Set<string>> = {}
 
   async function initServer() {
     server = await createServer({
@@ -73,13 +75,33 @@ export default createUnplugin<Options | undefined>((rawOptions = {}) => {
     },
 
     transform(code, id) {
-      return transformMacros(code, id, runner)
+      return transformMacros(code, id, runner, deps)
     },
 
     vite: {
       configureServer(_server) {
         builtInServer = false
         server = _server
+      },
+
+      handleHotUpdate({ file, server, modules }) {
+        const cache = runner.moduleCache
+        const mod = cache.get(file)
+        if (!mod) return
+
+        node.fetchCache.delete(file)
+        cache.invalidateModule(mod)
+
+        const affected = new Set<ModuleNode>()
+
+        for (const [id, macrosIds] of Object.entries(deps)) {
+          if (!macrosIds.has(file)) continue
+          server.moduleGraph
+            .getModulesByFile(id)
+            ?.forEach((m) => affected.add(m))
+        }
+
+        return [...affected, ...modules]
       },
     },
   }
