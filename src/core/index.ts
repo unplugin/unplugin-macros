@@ -2,6 +2,8 @@ import {
   attachScopes,
   babelParse,
   isLiteralType,
+  isTypeOf,
+  resolveIdentifier,
   resolveLiteral,
   walkAST,
   walkImportDeclaration,
@@ -24,9 +26,9 @@ export async function transformMacros(
   const imports = recordImports()
 
   let scope = attachScopes(program, 'scope')
-  const macroUsages: {
+  const macros: {
     node: CallExpression
-    fn: string
+    fn: string[]
     args: any[]
   }[] = []
   walkAST<WithScope<Node>>(program, {
@@ -35,17 +37,17 @@ export async function transformMacros(
 
       if (
         node.type === 'CallExpression' &&
-        node.callee.type === 'Identifier' &&
-        !scope.contains(node.callee.name)
+        isTypeOf(node.callee, ['Identifier', 'MemberExpression'])
       ) {
-        if (!imports[node.callee.name]) return
+        const fn = resolveIdentifier(node.callee)
+        if (!imports[fn[0]]) return
         const args = node.arguments.map((arg) => {
           if (isLiteralType(arg)) return resolveLiteral(arg)
           throw new Error('Macro arguments must be literals.')
         })
-        macroUsages.push({
+        macros.push({
           node,
-          fn: node.callee.name,
+          fn,
           args,
         })
       }
@@ -55,13 +57,29 @@ export async function transformMacros(
     },
   })
 
-  for (const { node, fn, args } of macroUsages) {
-    const binding = imports[fn]
+  for (const {
+    node,
+    fn: [local, ...keys],
+    args,
+  } of macros) {
+    const binding = imports[local]
     const [, resolved] = await runner.resolveUrl(binding.source, id)
 
     const module = await runner.executeFile(resolved)
-    const ret = module[binding.imported](...args)
-    s.overwriteNode(node, String(ret))
+    let fn: any = module
+
+    const props = [...keys]
+    if (binding.imported !== '*') props.unshift(binding.imported)
+    for (const key of props) {
+      fn = fn?.[key]
+    }
+
+    if (!fn) {
+      throw new Error(`Macro ${local} is not existed.`)
+    }
+
+    const ret = fn(...args)
+    s.overwriteNode(node, ret === undefined ? 'undefined' : JSON.stringify(ret))
   }
 
   return getTransformResult(s, id)
