@@ -1,0 +1,12 @@
+{
+  "version": "1.0.0",
+  "scripts": {
+    "build": "tsx build.ts",
+    "watch": "tsx watch build.ts",
+    "dev": "tsx watch dev.mts"
+  },
+  "devDependencies": {
+    "esbuild": "^0.17.19",
+    "tsx": "^3.12.7"
+  }
+}

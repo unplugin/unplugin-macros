@@ -73,6 +73,15 @@ importers:
         specifier: ^0.31.4
         version: 0.31.4
 
+  examples/esbuild:
+    devDependencies:
+      esbuild:
+        specifier: ^0.17.19
+        version: 0.17.19
+      tsx:
+        specifier: ^3.12.7
+        version: 3.12.7
+
   examples/vite:
     devDependencies:
       typescript:
