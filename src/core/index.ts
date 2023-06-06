@@ -10,7 +10,7 @@ import {
 } from 'ast-kit'
 import { MagicString } from 'magic-string-ast'
 import type { ImportBinding, WithScope } from 'ast-kit'
-import type { CallExpression, ImportAttribute, Node } from '@babel/types'
+import type { ImportAttribute, Node } from '@babel/types'
 import type { ViteNodeRunner } from 'vite-node/client'
 
 export async function transformMacros(
