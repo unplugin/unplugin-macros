@@ -28,12 +28,13 @@ export async function transformMacros(
 
   let scope = attachScopes(program, 'scope')
   const macros: {
-    node: CallExpression
+    node: Node
     fn: string[]
     args: any[]
+    isAwait: boolean
   }[] = []
   walkAST<WithScope<Node>>(program, {
-    enter(node) {
+    enter(node, parent) {
       if (node.scope) scope = node.scope
 
       if (
@@ -51,10 +52,13 @@ export async function transformMacros(
           if (isLiteralType(arg)) return resolveLiteral(arg)
           throw new Error('Macro arguments must be literals.')
         })
+        const isAwait = parent?.type === 'AwaitExpression'
+
         macros.push({
-          node,
+          node: isAwait ? parent : node,
           fn,
           args,
+          isAwait,
         })
       }
     },
@@ -73,6 +77,7 @@ export async function transformMacros(
     node,
     fn: [local, ...keys],
     args,
+    isAwait,
   } of macros) {
     const binding = imports[local]
     const [, resolved] = await runner.resolveUrl(binding.source, id)
@@ -90,7 +95,11 @@ export async function transformMacros(
       throw new Error(`Macro ${local} is not existed.`)
     }
 
-    const ret = fn(...args)
+    let ret = fn(...args)
+    if (isAwait) {
+      ret = await ret
+    }
+
     s.overwriteNode(node, ret === undefined ? 'undefined' : JSON.stringify(ret))
 
     deps[id].add(resolved)

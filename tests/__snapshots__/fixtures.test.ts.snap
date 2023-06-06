@@ -26,3 +26,10 @@ exports[`fixture > tests/fixtures/nested-object.js 1`] = `
 "\\"foo\\" === 'foo';
 "
 `;
+
+exports[`fixture > tests/fixtures/promise.js 1`] = `
+"var promise = \\"ok\\";
+
+export { promise as default };
+"
+`;
