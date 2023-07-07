@@ -1,4 +1,4 @@
-import { basename, dirname, resolve } from 'path'
+import { basename, dirname, resolve } from 'node:path'
 import { readFile, writeFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import fg from 'fast-glob'

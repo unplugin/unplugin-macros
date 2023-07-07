@@ -1,13 +1,11 @@
 import { createUnplugin } from 'unplugin'
 import { createFilter } from '@rollup/pluginutils'
-import { createServer } from 'vite'
+import { type ModuleNode, type ViteDevServer, createServer } from 'vite'
 import { ViteNodeServer } from 'vite-node/server'
 import { ViteNodeRunner } from 'vite-node/client'
 import { installSourcemapsSupport } from 'vite-node/source-map'
-import { resolveOptions } from './core/options'
+import { type Options, resolveOptions } from './core/options'
 import { transformMacros } from './core'
-import type { ModuleNode, ViteDevServer } from 'vite'
-import type { Options } from './core/options'
 
 export default createUnplugin<Options | undefined>((rawOptions = {}) => {
   const options = resolveOptions(rawOptions)

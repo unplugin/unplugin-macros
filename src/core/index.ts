@@ -1,4 +1,6 @@
 import {
+  type ImportBinding,
+  type WithScope,
   attachScopes,
   babelParse,
   isLiteralType,
@@ -9,9 +11,8 @@ import {
   walkImportDeclaration,
 } from 'ast-kit'
 import { MagicString } from 'magic-string-ast'
-import type { ImportBinding, WithScope } from 'ast-kit'
-import type { ImportAttribute, Node } from '@babel/types'
-import type { ViteNodeRunner } from 'vite-node/client'
+import { type ImportAttribute, type Node } from '@babel/types'
+import { type ViteNodeRunner } from 'vite-node/client'
 
 export async function transformMacros(
   code: string,
