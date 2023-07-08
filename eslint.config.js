@@ -1,2 +1,6 @@
 const { sxzz } = require('@sxzz/eslint-config')
-module.exports = sxzz()
+module.exports = sxzz([
+  {
+    ignores: ['README.md'],
+  },
+])
