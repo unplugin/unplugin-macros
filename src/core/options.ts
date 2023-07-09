@@ -2,7 +2,13 @@ import { type InlineConfig } from 'vite'
 import { type FilterPattern } from '@rollup/pluginutils'
 
 export interface Options {
+  /**
+   * @default [/\.[cm]?[jt]sx?$/]
+   */
   include?: FilterPattern
+  /**
+   * @default [/node_modules/]
+   */
   exclude?: FilterPattern
   /**
    * Available except Vite itself.
@@ -20,7 +26,7 @@ export type OptionsResolved = Omit<Required<Options>, 'exclude'> & {
 export function resolveOptions(options: Options): OptionsResolved {
   return {
     include: options.include || [/\.[cm]?[jt]sx?$/],
-    exclude: options.exclude,
+    exclude: options.exclude || [/node_modules/],
     viteConfig: options.viteConfig || {},
   }
 }
