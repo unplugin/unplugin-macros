@@ -17,6 +17,11 @@ exports[`fixture > tests/fixtures/basic.js 1`] = `
 "
 `;
 
+exports[`fixture > tests/fixtures/dedent.js 1`] = `
+"const msg = \\"if (true) {\\\\n  const a = 'b'\\\\n}\\";
+"
+`;
+
 exports[`fixture > tests/fixtures/import-namespace.js 1`] = `
 "0.5 === 0.5;
 "
