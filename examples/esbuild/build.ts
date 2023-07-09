@@ -9,6 +9,6 @@ build({
   outfile: 'dist/main.js',
   plugins: [Macros()],
   format: 'esm',
+}).then(() => {
+  console.log('Success')
 })
-
-console.log('Success')

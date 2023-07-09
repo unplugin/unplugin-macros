@@ -3,6 +3,7 @@ import {
   type WithScope,
   attachScopes,
   babelParse,
+  getLang,
   isLiteralType,
   isTypeOf,
   resolveIdentifier,
@@ -20,7 +21,7 @@ export async function transformMacros(
   runner: ViteNodeRunner,
   deps: Record<string, Set<string>>
 ) {
-  const program = babelParse(code, id, {
+  const program = babelParse(code, getLang(id), {
     plugins: [['importAttributes', { deprecatedAssertSyntax: true }]],
   })
   const s = new MagicString(code)
