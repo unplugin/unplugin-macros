@@ -40,7 +40,7 @@ export async function transformMacros(
   })
   const s = new MagicString(code)
 
-  const imports = recordImports()
+  const imports = new Map(Object.entries(recordImports()))
 
   let scope = attachScopes(program, 'scope')
   const macros: Macro[] = []
@@ -59,7 +59,7 @@ export async function transformMacros(
         } catch {
           return
         }
-        if (!imports[id[0]] || scope.contains(id[0])) return
+        if (!imports.has(id[0]) || scope.contains(id[0])) return
         const args = node.arguments.map((arg) => {
           if (isLiteralType(arg)) return resolveLiteral(arg)
           throw new Error('Macro arguments must be literals.')
@@ -89,7 +89,7 @@ export async function transformMacros(
         } catch {
           return
         }
-        if (!imports[id[0]] || scope.contains(id[0])) return
+        if (!imports.has(id[0]) || scope.contains(id[0])) return
         macros.push({
           type: 'identifier',
           node,
@@ -114,7 +114,7 @@ export async function transformMacros(
       node,
       id: [local, ...keys],
     } = macro
-    const binding = imports[local]
+    const binding = imports.get(local)!
     const [, resolved] = await runner.resolveUrl(binding.source, id)
 
     const module = await runner.executeFile(resolved)

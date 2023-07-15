@@ -42,6 +42,8 @@ exports[`fixture > tests/fixtures/non-macros.js 1`] = `
   const getRandom = () => 2;
   getRandom() === 2;
 }
+
+''.toString();
 "
 `;
 
