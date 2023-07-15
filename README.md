@@ -3,7 +3,7 @@
 [![Unit Test](https://github.com/sxzz/unplugin-macros/actions/workflows/unit-test.yml/badge.svg)](https://github.com/sxzz/unplugin-macros/actions/workflows/unit-test.yml)
 
 > Macros are a mechanism for running JavaScript functions at bundle-time.
-> The value returned from these functions are directly inlined into your bundle.
+> The value returned from these functions or variables are directly inlined into your bundle.
 
 ## Installation
 
