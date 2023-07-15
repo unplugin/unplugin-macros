@@ -5,6 +5,7 @@ import {
   babelParse,
   getLang,
   isLiteralType,
+  isReferenced,
   isTypeOf,
   resolveIdentifier,
   resolveLiteral,
@@ -33,7 +34,7 @@ export async function transformMacros(
   code: string,
   id: string,
   runner: ViteNodeRunner,
-  deps: Record<string, Set<string>>
+  deps: Map<string, Set<string>>
 ) {
   const program = babelParse(code, getLang(id), {
     plugins: [['importAttributes', { deprecatedAssertSyntax: true }]],
@@ -44,10 +45,17 @@ export async function transformMacros(
 
   let scope = attachScopes(program, 'scope')
   const macros: Macro[] = []
+  const parentStack: Node[] = []
 
   walkAST<WithScope<Node>>(program, {
     enter(node, parent) {
+      parent && parentStack.push(parent)
       if (node.scope) scope = node.scope
+
+      if (node.type.startsWith('TS')) {
+        this.skip()
+        return
+      }
 
       if (
         node.type === 'CallExpression' &&
@@ -76,12 +84,7 @@ export async function transformMacros(
         this.skip()
       } else if (
         isTypeOf(node, ['Identifier', 'MemberExpression']) &&
-        !isTypeOf(parent, [
-          'ImportDefaultSpecifier',
-          'ImportSpecifier',
-          'ImportNamespaceSpecifier',
-          'ImportAttribute',
-        ])
+        (!parent || isReferenced(node, parent, parentStack.at(-2)))
       ) {
         let id: string[]
         try {
@@ -100,15 +103,16 @@ export async function transformMacros(
     },
     leave(node) {
       if (node.scope) scope = scope.parent!
+      parentStack.pop()
     },
   })
 
   if (macros.length === 0) {
-    delete deps[id]
+    deps.delete(id)
     return
   }
 
-  deps[id] = new Set()
+  deps.set(id, new Set())
   for (const macro of macros) {
     const {
       node,
@@ -142,7 +146,7 @@ export async function transformMacros(
 
     s.overwriteNode(node, ret === undefined ? 'undefined' : JSON.stringify(ret))
 
-    deps[id].add(resolved)
+    deps.get(id)!.add(resolved)
   }
 
   return getTransformResult(s, id)

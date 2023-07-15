@@ -15,6 +15,8 @@ exports[`fixture > tests/fixtures/basic.js 1`] = `
 2 === 2;
 3 === 3;
 1 === 1;
+
+const { bar = 1 } = {};
 "
 `;
 
@@ -38,12 +40,30 @@ exports[`fixture > tests/fixtures/non-macros.js 1`] = `
   return Math.random()
 }
 
+function toString(v) {
+  return v.toString()
+}
+
 {
   const getRandom = () => 2;
   getRandom() === 2;
 }
 
 ''.toString();
+
+const genHex = () =>
+  Math.floor(Math.random() * 255)
+    .toString(16)
+    .padStart(2, '0');
+
+const foo = {
+  toString: '',
+};
+
+class TestCls {
+  toString() {}
+  #toString() {}
+}
 "
 `;
 

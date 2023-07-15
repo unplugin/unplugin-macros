@@ -16,7 +16,7 @@ export default createUnplugin<Options | undefined>((rawOptions = {}) => {
   let node: ViteNodeServer
   let runner: ViteNodeRunner
 
-  const deps: Record<string, Set<string>> = {}
+  const deps: Map<string, Set<string>> = new Map()
 
   async function initServer() {
     server = await createServer({
@@ -93,7 +93,7 @@ export default createUnplugin<Options | undefined>((rawOptions = {}) => {
 
         const affected = new Set<ModuleNode>()
 
-        for (const [id, macrosIds] of Object.entries(deps)) {
+        for (const [id, macrosIds] of deps.entries()) {
           if (!macrosIds.has(file)) continue
           server.moduleGraph
             .getModulesByFile(id)

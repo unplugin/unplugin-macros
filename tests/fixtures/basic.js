@@ -7,3 +7,5 @@ inc() === 1
 inc() === 2
 inc() === 3
 foo === 1
+
+const { bar = foo } = {}
