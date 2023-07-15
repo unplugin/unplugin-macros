@@ -17,10 +17,15 @@ export interface Options {
    * @see https://vitejs.dev/config/
    */
   viteConfig?: InlineConfig
+  /**
+   * Adjust the plugin order (only works for Vite and Webpack)
+   * @default 'pre'
+   */
+  enforce?: 'pre' | 'post' | undefined
 }
 
-export type OptionsResolved = Omit<Required<Options>, 'exclude'> & {
-  exclude?: Options['exclude']
+export type OptionsResolved = Omit<Required<Options>, 'enforce'> & {
+  enforce?: Options['enforce']
 }
 
 export function resolveOptions(options: Options): OptionsResolved {
@@ -28,5 +33,6 @@ export function resolveOptions(options: Options): OptionsResolved {
     include: options.include || [/\.[cm]?[jt]sx?$/],
     exclude: options.exclude || [/node_modules/],
     viteConfig: options.viteConfig || {},
+    enforce: 'enforce' in options ? options.enforce : 'pre',
   }
 }

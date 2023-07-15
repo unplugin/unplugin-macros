@@ -56,6 +56,7 @@ export default createUnplugin<Options | undefined>((rawOptions = {}) => {
   const name = 'unplugin-macros'
   return {
     name,
+    enforce: options.enforce,
 
     async buildStart() {
       server || (await initServer())
