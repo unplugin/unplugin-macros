@@ -84,9 +84,10 @@ module.exports = {
 
 ```js
 // main.js
-import { getRandom } from './macros' assert { type: 'macro' }
+import { getRandom, buildTime } from './macros' assert { type: 'macro' }
 
 getRandom() // Will be replaced with a random number at build time
+buildTime // Will be replaced with the timestamp at the build time
 ```
 
 ```js
@@ -94,6 +95,7 @@ getRandom() // Will be replaced with a random number at build time
 export function getRandom() {
   return Math.random()
 }
+export const buildTime = Date.now()
 ```
 
 See more in [Bun Macros](https://bun.sh/blog/bun-macros).

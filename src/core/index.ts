@@ -15,6 +15,20 @@ import { MagicString } from 'magic-string-ast'
 import { type ImportAttribute, type Node } from '@babel/types'
 import { type ViteNodeRunner } from 'vite-node/client'
 
+interface MacroBase {
+  node: Node
+  id: string[]
+}
+interface CallMacro extends MacroBase {
+  type: 'call'
+  args: any[]
+  isAwait: boolean
+}
+interface IdentifierMacro extends MacroBase {
+  type: 'identifier'
+}
+type Macro = CallMacro | IdentifierMacro
+
 export async function transformMacros(
   code: string,
   id: string,
@@ -29,12 +43,8 @@ export async function transformMacros(
   const imports = recordImports()
 
   let scope = attachScopes(program, 'scope')
-  const macros: {
-    node: Node
-    fn: string[]
-    args: any[]
-    isAwait: boolean
-  }[] = []
+  const macros: Macro[] = []
+
   walkAST<WithScope<Node>>(program, {
     enter(node, parent) {
       if (node.scope) scope = node.scope
@@ -43,13 +53,13 @@ export async function transformMacros(
         node.type === 'CallExpression' &&
         isTypeOf(node.callee, ['Identifier', 'MemberExpression'])
       ) {
-        let fn: string[]
+        let id: string[]
         try {
-          fn = resolveIdentifier(node.callee)
+          id = resolveIdentifier(node.callee)
         } catch {
           return
         }
-        if (!imports[fn[0]] || scope.contains(fn[0])) return
+        if (!imports[id[0]] || scope.contains(id[0])) return
         const args = node.arguments.map((arg) => {
           if (isLiteralType(arg)) return resolveLiteral(arg)
           throw new Error('Macro arguments must be literals.')
@@ -57,11 +67,35 @@ export async function transformMacros(
         const isAwait = parent?.type === 'AwaitExpression'
 
         macros.push({
+          type: 'call',
           node: isAwait ? parent : node,
-          fn,
+          id,
           args,
           isAwait,
         })
+        this.skip()
+      } else if (
+        isTypeOf(node, ['Identifier', 'MemberExpression']) &&
+        !isTypeOf(parent, [
+          'ImportDefaultSpecifier',
+          'ImportSpecifier',
+          'ImportNamespaceSpecifier',
+          'ImportAttribute',
+        ])
+      ) {
+        let id: string[]
+        try {
+          id = resolveIdentifier(node)
+        } catch {
+          return
+        }
+        if (!imports[id[0]] || scope.contains(id[0])) return
+        macros.push({
+          type: 'identifier',
+          node,
+          id,
+        })
+        this.skip()
       }
     },
     leave(node) {
@@ -75,31 +109,35 @@ export async function transformMacros(
   }
 
   deps[id] = new Set()
-  for (const {
-    node,
-    fn: [local, ...keys],
-    args,
-    isAwait,
-  } of macros) {
+  for (const macro of macros) {
+    const {
+      node,
+      id: [local, ...keys],
+    } = macro
     const binding = imports[local]
     const [, resolved] = await runner.resolveUrl(binding.source, id)
 
     const module = await runner.executeFile(resolved)
-    let fn: any = module
+    let exported: any = module
 
     const props = [...keys]
     if (binding.imported !== '*') props.unshift(binding.imported)
     for (const key of props) {
-      fn = fn?.[key]
+      exported = exported?.[key]
     }
 
-    if (!fn) {
+    if (!exported) {
       throw new Error(`Macro ${local} is not existed.`)
     }
 
-    let ret = fn(...args)
-    if (isAwait) {
-      ret = await ret
+    let ret: any
+    if (macro.type === 'call') {
+      ret = exported(...macro.args)
+      if (macro.isAwait) {
+        ret = await ret
+      }
+    } else {
+      ret = exported
     }
 
     s.overwriteNode(node, ret === undefined ? 'undefined' : JSON.stringify(ret))
