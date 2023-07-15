@@ -32,6 +32,18 @@ exports[`fixture > tests/fixtures/nested-object.js 1`] = `
 "
 `;
 
+exports[`fixture > tests/fixtures/non-macros.js 1`] = `
+"function getRandom() {
+  return Math.random()
+}
+
+{
+  const getRandom = () => 2;
+  getRandom() === 2;
+}
+"
+`;
+
 exports[`fixture > tests/fixtures/promise.js 1`] = `
 "var promise = \\"ok\\";
 

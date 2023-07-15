@@ -49,7 +49,7 @@ export async function transformMacros(
         } catch {
           return
         }
-        if (!imports[fn[0]]) return
+        if (!imports[fn[0]] || scope.contains(fn[0])) return
         const args = node.arguments.map((arg) => {
           if (isLiteralType(arg)) return resolveLiteral(arg)
           throw new Error('Macro arguments must be literals.')
