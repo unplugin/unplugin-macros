@@ -12,7 +12,7 @@ import {
   walkAST,
   walkImportDeclaration,
 } from 'ast-kit'
-import { MagicString } from 'magic-string-ast'
+import { MagicString, generateTransform } from 'magic-string-ast'
 import { type ImportAttribute, type Node } from '@babel/types'
 import { type ViteNodeRunner } from 'vite-node/client'
 
@@ -149,7 +149,7 @@ export async function transformMacros(
     deps.get(id)!.add(resolved)
   }
 
-  return getTransformResult(s, id)
+  return generateTransform(s, id)
 
   function recordImports() {
     const imports: Record<string, ImportBinding> = {}
@@ -174,22 +174,4 @@ function checkAttributes(attrs: ImportAttribute[]) {
       (attr.key.type === 'Identifier' ? attr.key.name : attr.key.value) ===
         'type' && attr.value.value === 'macro'
   )
-}
-
-export function getTransformResult(
-  s: MagicString | undefined,
-  id: string
-): { code: string; map: any } | undefined {
-  if (s?.hasChanged()) {
-    return {
-      code: s.toString(),
-      get map() {
-        return s.generateMap({
-          source: id,
-          includeContent: true,
-          hires: true,
-        })
-      },
-    }
-  }
 }
