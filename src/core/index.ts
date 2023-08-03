@@ -19,11 +19,11 @@ import { type ViteNodeRunner } from 'vite-node/client'
 interface MacroBase {
   node: Node
   id: string[]
+  isAwait: boolean
 }
 interface CallMacro extends MacroBase {
   type: 'call'
   args: any[]
-  isAwait: boolean
 }
 interface IdentifierMacro extends MacroBase {
   type: 'identifier'
@@ -57,6 +57,8 @@ export async function transformMacros(
         return
       }
 
+      const isAwait = parent?.type === 'AwaitExpression'
+
       if (
         node.type === 'CallExpression' &&
         isTypeOf(node.callee, ['Identifier', 'MemberExpression'])
@@ -72,7 +74,6 @@ export async function transformMacros(
           if (isLiteralType(arg)) return resolveLiteral(arg)
           throw new Error('Macro arguments must be literals.')
         })
-        const isAwait = parent?.type === 'AwaitExpression'
 
         macros.push({
           type: 'call',
@@ -93,10 +94,12 @@ export async function transformMacros(
           return
         }
         if (!imports.has(id[0]) || scope.contains(id[0])) return
+
         macros.push({
           type: 'identifier',
-          node,
+          node: isAwait ? parent : node,
           id,
+          isAwait,
         })
         this.skip()
       }
@@ -117,6 +120,7 @@ export async function transformMacros(
     const {
       node,
       id: [local, ...keys],
+      isAwait,
     } = macro
     const binding = imports.get(local)!
     const [, resolved] = await runner.resolveUrl(binding.source, id)
@@ -137,11 +141,12 @@ export async function transformMacros(
     let ret: any
     if (macro.type === 'call') {
       ret = exported(...macro.args)
-      if (macro.isAwait) {
-        ret = await ret
-      }
     } else {
       ret = exported
+    }
+
+    if (isAwait) {
+      ret = await ret
     }
 
     s.overwriteNode(node, ret === undefined ? 'undefined' : JSON.stringify(ret))

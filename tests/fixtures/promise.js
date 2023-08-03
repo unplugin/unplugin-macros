@@ -1,3 +1,4 @@
-import { promise } from './macros/promise' assert { type: 'macro' }
+import { promise, p } from './macros/promise' assert { type: 'macro' }
 
-export default await promise()
+const a = await promise()
+const b = await p

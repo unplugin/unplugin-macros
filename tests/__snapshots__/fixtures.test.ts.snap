@@ -68,8 +68,7 @@ class TestCls {
 `;
 
 exports[`fixture > tests/fixtures/promise.js 1`] = `
-"var promise = \\"ok\\";
-
-export { promise as default };
+"const a = \\"ok\\";
+const b = \\"ok\\";
 "
 `;
