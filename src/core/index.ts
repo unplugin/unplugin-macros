@@ -38,7 +38,7 @@ type Macro = CallMacro | IdentifierMacro
 export async function transformMacros(
   code: string,
   id: string,
-  runner: ViteNodeRunner,
+  getRunner: () => Promise<ViteNodeRunner>,
   deps: Map<string, Set<string>>
 ) {
   const program = babelParse(code, getLang(id), {
@@ -119,6 +119,8 @@ export async function transformMacros(
     deps.delete(id)
     return
   }
+
+  const runner = await getRunner()
 
   deps.set(id, new Set())
   for (const macro of macros) {

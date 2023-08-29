@@ -20,6 +20,7 @@ export default createUnplugin<Options | undefined, false>((rawOptions = {}) => {
 
   const deps: Map<string, Set<string>> = new Map()
 
+  let initPromise: Promise<void> | undefined
   async function initServer() {
     server = await createServer({
       ...options.viteConfig,
@@ -29,7 +30,6 @@ export default createUnplugin<Options | undefined, false>((rawOptions = {}) => {
     })
     await server.pluginContainer.buildStart({})
   }
-
   function initRunner() {
     // create vite-node server
     node = new ViteNodeServer(server)
@@ -54,19 +54,26 @@ export default createUnplugin<Options | undefined, false>((rawOptions = {}) => {
       },
     })
   }
+  function init() {
+    if (initPromise) return initPromise
+    return (initPromise = (async () => {
+      server || (await initServer())
+      initRunner()
+    })())
+  }
+
+  async function getRunner() {
+    await init()
+    return runner
+  }
 
   const name = 'unplugin-macros'
   return {
     name,
     enforce: options.enforce,
 
-    async buildStart() {
-      server || (await initServer())
-      initRunner()
-    },
-
     buildEnd() {
-      if (builtInServer)
+      if (builtInServer && server)
         // close the built-in vite server
         return server.close()
     },
@@ -76,7 +83,7 @@ export default createUnplugin<Options | undefined, false>((rawOptions = {}) => {
     },
 
     transform(code, id) {
-      return transformMacros(code, id, runner, deps)
+      return transformMacros(code, id, getRunner, deps)
     },
 
     vite: {
