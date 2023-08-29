@@ -5,7 +5,7 @@ import { ViteNodeServer } from 'vite-node/server'
 import { ViteNodeRunner } from 'vite-node/client'
 import { installSourcemapsSupport } from 'vite-node/source-map'
 import { type Options, resolveOptions } from './core/options'
-import { transformMacros } from './core'
+import { type MacroContext, transformMacros } from './core'
 
 export type { Options, MacroContext } from './core'
 
@@ -107,3 +107,9 @@ export default createUnplugin<Options | undefined, false>((rawOptions = {}) => {
     },
   }
 })
+
+export function defineMacro<Fn extends (...args: any) => any>(
+  fn: (this: MacroContext, ...args: Parameters<Fn>) => ReturnType<Fn>
+): (...args: Parameters<Fn>) => ReturnType<Fn> {
+  return fn as any
+}
