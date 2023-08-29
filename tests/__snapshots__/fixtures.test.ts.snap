@@ -20,6 +20,11 @@ const { bar = 1 } = {};
 "
 `;
 
+exports[`fixture > tests/fixtures/ctx.js 1`] = `
+"\\"ctx.js\\" === 'ctx.js';
+"
+`;
+
 exports[`fixture > tests/fixtures/dedent.js 1`] = `
 "const msg = \\"if (true) {\\\\n  const a = 'b'\\\\n}\\";
 "

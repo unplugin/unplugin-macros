@@ -7,6 +7,8 @@ import { installSourcemapsSupport } from 'vite-node/source-map'
 import { type Options, resolveOptions } from './core/options'
 import { transformMacros } from './core'
 
+export type { Options, MacroContext } from './core'
+
 export default createUnplugin<Options | undefined, false>((rawOptions = {}) => {
   const options = resolveOptions(rawOptions)
   const filter = createFilter(options.include, options.exclude)

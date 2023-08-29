@@ -16,6 +16,11 @@ import { MagicString, generateTransform } from 'magic-string-ast'
 import { type ImportAttribute, type Node } from '@babel/types'
 import { type ViteNodeRunner } from 'vite-node/client'
 
+export * from './options'
+export interface MacroContext {
+  id: string
+}
+
 interface MacroBase {
   node: Node
   id: string[]
@@ -140,7 +145,10 @@ export async function transformMacros(
 
     let ret: any
     if (macro.type === 'call') {
-      ret = exported(...macro.args)
+      const ctx: MacroContext = {
+        id,
+      }
+      ret = (exported as Function).apply(ctx, macro.args)
     } else {
       ret = exported
     }
