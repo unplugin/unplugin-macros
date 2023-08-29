@@ -9,6 +9,7 @@ import {
   isTypeOf,
   resolveIdentifier,
   resolveLiteral,
+  resolveObjectKey,
   walkAST,
   walkImportDeclaration,
 } from 'ast-kit'
@@ -185,8 +186,6 @@ export async function transformMacros(
 
 function checkAttributes(attrs: ImportAttribute[]) {
   return attrs.some(
-    (attr) =>
-      (attr.key.type === 'Identifier' ? attr.key.name : attr.key.value) ===
-        'type' && attr.value.value === 'macro'
+    (attr) => resolveObjectKey(attr) === 'type' && attr.value.value === 'macro'
   )
 }

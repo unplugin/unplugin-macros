@@ -12,8 +12,8 @@ importers:
         specifier: ^5.0.4
         version: 5.0.4(rollup@3.28.1)
       ast-kit:
-        specifier: ^0.11.0
-        version: 0.11.0(rollup@3.28.1)
+        specifier: ^0.11.1
+        version: 0.11.1(rollup@3.28.1)
       magic-string:
         specifier: ^0.30.3
         version: 0.30.3
@@ -1476,8 +1476,8 @@ packages:
     resolution: {integrity: sha512-jgsaNduz+ndvGyFt3uSuWqvy4lCnIJiovtouQN5JZHOKCS2QuhEdbcQHFhVksz2N2U9hXJo8odG7ETyWlEeuDw==}
     dev: true
 
-  /ast-kit@0.11.0(rollup@3.28.1):
-    resolution: {integrity: sha512-EKvEIC9Emq/AtZExJS3WG2B1s+4AqoRIHxrHKLGbEbchGDm98iT5/n3fr7jAhnmUdJQNbzkzfsH90GSzBY1oKg==}
+  /ast-kit@0.11.1(rollup@3.28.1):
+    resolution: {integrity: sha512-pbriAgko/hGuAFu+Elxpt1ptAZIf0jk7vENkSvhSEClv1vQnc/k1oPzuEiYZx5NonE7VPr5wsv+R7PNjAFkisg==}
     engines: {node: '>=16.14.0'}
     dependencies:
       '@babel/parser': 7.22.13
