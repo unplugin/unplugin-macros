@@ -22,6 +22,13 @@ export interface Options {
    * @default 'pre'
    */
   enforce?: 'pre' | 'post' | undefined
+
+  /**
+   * Import attribute mapping
+   *
+   * @default { "type": "macro" }
+   */
+  attrs?: Record<string, string>
 }
 
 export type OptionsResolved = Omit<Required<Options>, 'enforce'> & {
@@ -34,5 +41,6 @@ export function resolveOptions(options: Options): OptionsResolved {
     exclude: options.exclude || [/node_modules/],
     viteConfig: options.viteConfig || {},
     enforce: 'enforce' in options ? options.enforce : 'pre',
+    attrs: options.attrs || { type: 'macro' },
   }
 }

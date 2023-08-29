@@ -40,7 +40,8 @@ export async function transformMacros(
   code: string,
   id: string,
   getRunner: () => Promise<ViteNodeRunner>,
-  deps: Map<string, Set<string>>
+  deps: Map<string, Set<string>>,
+  attrs: Record<string, string>
 ) {
   const program = babelParse(code, getLang(id), {
     plugins: [['importAttributes', { deprecatedAssertSyntax: true }]],
@@ -174,7 +175,7 @@ export async function transformMacros(
         node.type === 'ImportDeclaration' &&
         node.importKind !== 'type' &&
         node.attributes &&
-        checkAttributes(node.attributes)
+        checkImportAttributes(attrs, node.attributes)
       ) {
         s.removeNode(node)
         walkImportDeclaration(imports, node)
@@ -184,8 +185,14 @@ export async function transformMacros(
   }
 }
 
-function checkAttributes(attrs: ImportAttribute[]) {
-  return attrs.some(
-    (attr) => resolveObjectKey(attr) === 'type' && attr.value.value === 'macro'
+function checkImportAttributes(
+  expected: Record<string, string>,
+  actual: ImportAttribute[]
+) {
+  const actualAttrs = Object.fromEntries(
+    actual.map((attr) => [resolveObjectKey(attr), attr.value.value])
+  )
+  return Object.entries(expected).every(
+    ([key, expectedValue]) => actualAttrs[key] === expectedValue
   )
 }

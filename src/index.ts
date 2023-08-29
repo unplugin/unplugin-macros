@@ -83,7 +83,7 @@ export default createUnplugin<Options | undefined, false>((rawOptions = {}) => {
     },
 
     transform(code, id) {
-      return transformMacros(code, id, getRunner, deps)
+      return transformMacros(code, id, getRunner, deps, options.attrs)
     },
 
     vite: {
