@@ -11,13 +11,13 @@
     "webpack"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/sxzz/unplugin-macros#readme",
+  "homepage": "https://github.com/unplugin/unplugin-macros#readme",
   "bugs": {
-    "url": "https://github.com/sxzz/unplugin-macros/issues"
+    "url": "https://github.com/unplugin/unplugin-macros/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sxzz/unplugin-macros.git"
+    "url": "git+https://github.com/unplugin/unplugin-macros.git"
   },
   "author": "三咲智子 <sxzz@sxzz.moe>",
   "files": [
