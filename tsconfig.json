@@ -1,16 +1,16 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "module": "esnext",
     "lib": ["es2022"],
-    "strict": true,
-    "esModuleInterop": true,
+    "jsx": "preserve",
+    "module": "esnext",
     "moduleResolution": "bundler",
-    "skipLibCheck": true,
-    "noUnusedLocals": true,
-    "resolveJsonModule": true,
     "types": ["node"],
-    "jsx": "preserve"
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "skipLibCheck": true
   },
   "include": ["src", "tests", "scripts"],
   "exclude": ["tests/fixtures"]
