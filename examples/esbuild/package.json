@@ -6,7 +6,7 @@
     "dev": "tsx watch dev.mts"
   },
   "devDependencies": {
-    "esbuild": "^0.19.2",
-    "tsx": "^3.12.7"
+    "esbuild": "^0.19.4",
+    "tsx": "^3.13.0"
   }
 }
