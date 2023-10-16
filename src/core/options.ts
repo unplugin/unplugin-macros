@@ -1,5 +1,5 @@
-import { type InlineConfig } from 'vite'
-import { type FilterPattern } from '@rollup/pluginutils'
+import type { InlineConfig } from 'vite'
+import type { FilterPattern } from '@rollup/pluginutils'
 
 export interface Options {
   /**

@@ -14,8 +14,8 @@ import {
   walkImportDeclaration,
 } from 'ast-kit'
 import { MagicString, generateTransform } from 'magic-string-ast'
-import { type ImportAttribute, type Node } from '@babel/types'
-import { type ViteNodeRunner } from 'vite-node/client'
+import type { ImportAttribute, Node } from '@babel/types'
+import type { ViteNodeRunner } from 'vite-node/client'
 
 export * from './options'
 export interface MacroContext {
