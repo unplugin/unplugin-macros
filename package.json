@@ -1,7 +1,7 @@
 {
   "name": "unplugin-macros",
   "version": "0.8.3",
-  "packageManager": "pnpm@8.9.2",
+  "packageManager": "pnpm@8.10.0",
   "description": "Macros for bundlers.",
   "keywords": [
     "unplugin",
@@ -87,7 +87,7 @@
     "@sxzz/eslint-config": "^3.7.0",
     "@sxzz/prettier-config": "^1.0.4",
     "@types/dedent": "^0.7.1",
-    "@types/node": "^20.8.7",
+    "@types/node": "^20.8.9",
     "@vue-macros/test-utils": "^1.2.0",
     "bumpp": "^9.2.0",
     "dedent": "^1.5.1",
@@ -95,7 +95,7 @@
     "eslint-define-config": "^1.24.1",
     "fast-glob": "^3.3.1",
     "prettier": "^3.0.3",
-    "rollup": "^4.1.4",
+    "rollup": "^4.1.5",
     "tsup": "^7.2.0",
     "tsx": "^3.14.0",
     "typescript": "^5.2.2",
