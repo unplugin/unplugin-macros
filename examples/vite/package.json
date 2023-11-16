@@ -11,6 +11,6 @@
   "devDependencies": {
     "typescript": "^5.2.2",
     "unplugin-macros": "workspace:*",
-    "vite": "^4.4.11"
+    "vite": "^5.0.0"
   }
 }

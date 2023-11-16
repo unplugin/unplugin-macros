@@ -116,7 +116,7 @@ export default createUnplugin<Options | undefined, false>((rawOptions = {}) => {
 })
 
 export function defineMacro<Args extends any[], Return>(
-  fn: (this: MacroContext, ...args: Args) => Return
+  fn: (this: MacroContext, ...args: Args) => Return,
 ): (...args: Args) => Return {
   return fn
 }
