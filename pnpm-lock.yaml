@@ -54,9 +54,6 @@ importers:
       eslint:
         specifier: ^8.54.0
         version: 8.54.0
-      eslint-define-config:
-        specifier: ^1.24.1
-        version: 1.24.1
       fast-glob:
         specifier: ^3.3.2
         version: 3.3.2
