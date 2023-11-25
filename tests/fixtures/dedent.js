@@ -1,4 +1,4 @@
-import dedent from 'dedent' assert { type: 'macro' }
+import dedent from 'dedent' with { type: 'macro' }
 
 const msg = dedent(`
   if (true) {

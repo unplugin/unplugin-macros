@@ -1,5 +1,5 @@
-import { getRandom } from './macros/rand' assert { type: 'macro' }
-import { toString } from './macros/string' assert { type: 'macro' }
+import { getRandom } from './macros/rand' with { type: 'macro' }
+import { toString } from './macros/string' with { type: 'macro' }
 
 {
   const getRandom = () => 2

@@ -84,7 +84,7 @@ module.exports = {
 
 ```js
 // main.js
-import { getRandom, buildTime } from './macros' assert { type: 'macro' }
+import { getRandom, buildTime } from './macros' with { type: 'macro' }
 
 getRandom() // Will be replaced with a random number at build time
 buildTime // Will be replaced with the timestamp at the build time
@@ -99,6 +99,14 @@ export const buildTime = Date.now()
 ```
 
 See more in [Bun Macros](https://bun.sh/blog/bun-macros).
+
+### TypeScript
+
+Import Attributes syntax is supported in TypeScript >= 5.3, but you can replace `with` keyword with `assert`, which is supported in TypeScript >= 4.5.
+
+### ESLint
+
+ESLint is not supported yet, but you can use [`@babel/eslint-parser`](https://www.npmjs.com/package/@babel/eslint-parser) or [`@typescript-eslint/parser`](https://typescript-eslint.io/packages/parser/).
 
 ## Thanks
 
