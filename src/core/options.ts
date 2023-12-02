@@ -1,4 +1,4 @@
-import type { InlineConfig } from 'vite'
+import type { InlineConfig, ViteDevServer } from 'vite'
 import type { FilterPattern } from '@rollup/pluginutils'
 
 export interface Options {
@@ -11,9 +11,14 @@ export interface Options {
    */
   exclude?: FilterPattern
   /**
-   * Available except Vite itself.
+   * Vite dev server instance
    *
-   * For Vite, the current Vite instance and configuration will be used directly, so this option will be ignored.
+   * If not provided and the bundler is Vite, it will be reuse current dev server.
+   * If not provided, it will try to use `viteConfig` to create one.
+   */
+  viteServer?: ViteDevServer | false
+  /**
+   * Available when `viteServer` is not provided.
    * @see https://vitejs.dev/config/
    */
   viteConfig?: InlineConfig
@@ -31,14 +36,19 @@ export interface Options {
   attrs?: Record<string, string>
 }
 
-export type OptionsResolved = Omit<Required<Options>, 'enforce'> & {
+export type OptionsResolved = Omit<
+  Required<Options>,
+  'enforce' | 'viteServer'
+> & {
   enforce?: Options['enforce']
+  viteServer?: Options['viteServer']
 }
 
 export function resolveOptions(options: Options): OptionsResolved {
   return {
     include: options.include || [/\.[cm]?[jt]sx?$/],
     exclude: options.exclude || [/node_modules/],
+    viteServer: options.viteServer,
     viteConfig: options.viteConfig || {},
     enforce: 'enforce' in options ? options.enforce : 'pre',
     attrs: options.attrs || { type: 'macro' },

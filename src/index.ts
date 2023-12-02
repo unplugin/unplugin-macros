@@ -13,7 +13,7 @@ export default createUnplugin<Options | undefined, false>((rawOptions = {}) => {
   const options = resolveOptions(rawOptions)
   const filter = createFilter(options.include, options.exclude)
 
-  let builtInServer = true
+  let externalServer: boolean
   let server: ViteDevServer
   let node: ViteNodeServer
   let runner: ViteNodeRunner
@@ -21,15 +21,31 @@ export default createUnplugin<Options | undefined, false>((rawOptions = {}) => {
   const deps: Map<string, Set<string>> = new Map()
 
   let initPromise: Promise<void> | undefined
+  function init() {
+    if (initPromise) return initPromise
+    return (initPromise = (async () => {
+      externalServer = !!options.viteServer
+      if (options.viteServer) {
+        server = options.viteServer
+        externalServer = false
+      } else {
+        server = await initServer()
+      }
+      initRunner()
+    })())
+  }
+
   async function initServer() {
-    server = await createServer({
+    const server = await createServer({
       ...options.viteConfig,
       optimizeDeps: {
         disabled: true,
       },
     })
     await server.pluginContainer.buildStart({})
+    return server
   }
+
   function initRunner() {
     // create vite-node server
     node = new ViteNodeServer(server)
@@ -54,13 +70,6 @@ export default createUnplugin<Options | undefined, false>((rawOptions = {}) => {
       },
     })
   }
-  function init() {
-    if (initPromise) return initPromise
-    return (initPromise = (async () => {
-      server || (await initServer())
-      initRunner()
-    })())
-  }
 
   async function getRunner() {
     await init()
@@ -73,7 +82,7 @@ export default createUnplugin<Options | undefined, false>((rawOptions = {}) => {
     enforce: options.enforce,
 
     buildEnd() {
-      if (builtInServer && server)
+      if (!externalServer && server)
         // close the built-in vite server
         return server.close()
     },
@@ -87,9 +96,10 @@ export default createUnplugin<Options | undefined, false>((rawOptions = {}) => {
     },
 
     vite: {
-      configureServer(_server) {
-        builtInServer = false
-        server = _server
+      configureServer(server) {
+        if (options.viteServer === undefined) {
+          options.viteServer = server
+        }
       },
 
       handleHotUpdate({ file, server, modules }) {
