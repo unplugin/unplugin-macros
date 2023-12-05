@@ -2,7 +2,7 @@
 
 exports[`fixture > tests/fixtures/args.js 1`] = `
 "0 === 0;
-\\"1\\" === '1';
+"1" === '1';
 false === false;
 null === null;
 undefined === undefined;
@@ -21,12 +21,12 @@ const { bar = 1 } = {};
 `;
 
 exports[`fixture > tests/fixtures/ctx.js 1`] = `
-"\\"ctx.js\\" === 'ctx.js';
+""ctx.js" === 'ctx.js';
 "
 `;
 
 exports[`fixture > tests/fixtures/dedent.js 1`] = `
-"const msg = \\"if (true) {\\\\n  const a = 'b'\\\\n}\\";
+"const msg = "if (true) {\\n  const a = 'b'\\n}";
 "
 `;
 
@@ -36,7 +36,7 @@ exports[`fixture > tests/fixtures/import-namespace.js 1`] = `
 `;
 
 exports[`fixture > tests/fixtures/nested-object.js 1`] = `
-"\\"foo\\" === 'foo';
+""foo" === 'foo';
 "
 `;
 
@@ -73,7 +73,7 @@ class TestCls {
 `;
 
 exports[`fixture > tests/fixtures/promise.js 1`] = `
-"const a = \\"ok\\";
-const b = \\"ok\\";
+"const a = "ok";
+const b = "ok";
 "
 `;
