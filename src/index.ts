@@ -16,7 +16,7 @@ export default createUnplugin<Options | undefined, false>((rawOptions = {}) => {
   let externalServer: boolean
   let server: ViteDevServer
   let node: ViteNodeServer
-  let runner: ViteNodeRunner
+  let runner: ViteNodeRunner | undefined
 
   const deps: Map<string, Set<string>> = new Map()
 
@@ -73,7 +73,7 @@ export default createUnplugin<Options | undefined, false>((rawOptions = {}) => {
 
   async function getRunner() {
     await init()
-    return runner
+    return runner!
   }
 
   const name = 'unplugin-macros'
@@ -103,6 +103,7 @@ export default createUnplugin<Options | undefined, false>((rawOptions = {}) => {
       },
 
       handleHotUpdate({ file, server, modules }) {
+        if (!runner) return
         const cache = runner.moduleCache
         const mod = cache.get(file)
         if (!mod) return
