@@ -42,6 +42,8 @@ export default {
 <details>
 <summary>esbuild</summary><br>
 
+Requires esbuild >= 0.15
+
 ```ts
 // esbuild.config.js
 import { build } from 'esbuild'
