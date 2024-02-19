@@ -83,7 +83,7 @@
   },
   "devDependencies": {
     "@babel/types": "^7.23.9",
-    "@sxzz/eslint-config": "^3.7.6",
+    "@sxzz/eslint-config": "^3.8.0",
     "@sxzz/prettier-config": "^2.0.0",
     "@types/dedent": "^0.7.2",
     "@types/node": "^20.11.19",
