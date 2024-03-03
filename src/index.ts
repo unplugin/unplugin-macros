@@ -39,7 +39,8 @@ export default createUnplugin<Options | undefined, false>((rawOptions = {}) => {
     const server = await createServer({
       ...options.viteConfig,
       optimizeDeps: {
-        disabled: true,
+        include: [],
+        noDiscovery: true,
       },
     })
     await server.pluginContainer.buildStart({})
