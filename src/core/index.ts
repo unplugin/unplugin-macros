@@ -66,6 +66,15 @@ export async function transformMacros(
 
       const isAwait = parent?.type === 'AwaitExpression'
 
+      if (node.type === 'TaggedTemplateExpression') {
+        node = {
+          ...(node as any),
+          type: 'CallExpression',
+          callee: node.tag,
+          arguments: [node.quasi],
+        }
+      }
+
       if (
         node.type === 'CallExpression' &&
         isTypeOf(node.callee, ['Identifier', 'MemberExpression'])

@@ -20,6 +20,11 @@ const { bar = 1 } = {};
 "
 `;
 
+exports[`fixture > tests/fixtures/css.js 1`] = `
+"const style = {"color":"red"};
+"
+`;
+
 exports[`fixture > tests/fixtures/ctx.js 1`] = `
 ""ctx.js" === 'ctx.js';
 "
