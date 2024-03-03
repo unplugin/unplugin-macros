@@ -92,8 +92,15 @@ export default createUnplugin<Options | undefined, false>((rawOptions = {}) => {
       return filter(id)
     },
 
-    transform(code, id) {
-      return transformMacros(code, id, getRunner, deps, options.attrs)
+    transform(source, id) {
+      return transformMacros({
+        source,
+        id,
+        getRunner,
+        deps,
+        attrs: options.attrs,
+        unpluginContext: this,
+      })
     },
 
     vite: {

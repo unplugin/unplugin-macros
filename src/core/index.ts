@@ -14,12 +14,21 @@ import {
   walkImportDeclaration,
 } from 'ast-kit'
 import { MagicString, generateTransform } from 'magic-string-ast'
+import type { UnpluginBuildContext, UnpluginContext } from 'unplugin'
 import type { ImportAttribute, Node } from '@babel/types'
 import type { ViteNodeRunner } from 'vite-node/client'
 
 export * from './options'
 export interface MacroContext {
   id: string
+  source: string
+  emitFile: UnpluginBuildContext['emitFile']
+  /**
+   * **Use with caution.**
+   *
+   * This is an experimental feature and may be changed at any time.
+   */
+  unpluginContext: UnpluginBuildContext & UnpluginContext
 }
 
 interface MacroBase {
@@ -36,17 +45,26 @@ interface IdentifierMacro extends MacroBase {
 }
 type Macro = CallMacro | IdentifierMacro
 
-export async function transformMacros(
-  code: string,
-  id: string,
-  getRunner: () => Promise<ViteNodeRunner>,
-  deps: Map<string, Set<string>>,
-  attrs: Record<string, string>,
-) {
-  const program = babelParse(code, getLang(id), {
+export async function transformMacros({
+  source,
+  id,
+  unpluginContext,
+  getRunner,
+  deps,
+  attrs,
+}: {
+  id: string
+  source: string
+  unpluginContext: UnpluginBuildContext & UnpluginContext
+
+  getRunner: () => Promise<ViteNodeRunner>
+  deps: Map<string, Set<string>>
+  attrs: Record<string, string>
+}) {
+  const program = babelParse(source, getLang(id), {
     plugins: [['importAttributes', { deprecatedAssertSyntax: true }]],
   })
-  const s = new MagicString(code)
+  const s = new MagicString(source)
 
   const imports = new Map(Object.entries(recordImports()))
   const macros = collectMacros()
@@ -89,6 +107,10 @@ export async function transformMacros(
       if (macro.type === 'call') {
         const ctx: MacroContext = {
           id,
+          source,
+          emitFile: unpluginContext.emitFile,
+
+          unpluginContext,
         }
         ret = (exported as Function).apply(ctx, macro.args)
       } else {
