@@ -68,20 +68,6 @@ module.exports = {
 
 <br></details>
 
-<details>
-<summary>Vue CLI</summary><br>
-
-```ts
-// vue.config.js
-module.exports = {
-  configureWebpack: {
-    plugins: [require('unplugin-macros/webpack')()],
-  },
-}
-```
-
-<br></details>
-
 ## Usage
 
 ```js
@@ -109,6 +95,10 @@ Import Attributes syntax is supported in TypeScript >= 5.3, but you can replace 
 ### ESLint
 
 ESLint is not supported Import Attributes syntax yet, but you can use [`@babel/eslint-parser`](https://www.npmjs.com/package/@babel/eslint-parser) or [`@typescript-eslint/parser`](https://typescript-eslint.io/packages/parser/).
+
+## Options
+
+Refer to [docs](https://jsr.io/@unplugin/macros/doc/api/~/Options).
 
 ## Thanks
 

@@ -19,6 +19,10 @@ import type { ImportAttribute, Node } from '@babel/types'
 import type { ViteNodeRunner } from 'vite-node/client'
 
 export * from './options'
+
+/**
+ * Represents the context object passed to macros.
+ */
 export interface MacroContext {
   id: string
   source: string
@@ -45,6 +49,11 @@ interface IdentifierMacro extends MacroBase {
 }
 type Macro = CallMacro | IdentifierMacro
 
+/**
+ * Transforms macros in the given source code.
+ * @param options - The transformation context options.
+ * @returns The transformed code and source map, or undefined if no macros were found.
+ */
 export async function transformMacros({
   source,
   id,
