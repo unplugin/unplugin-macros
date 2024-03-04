@@ -6,6 +6,8 @@ exports[`fixture > tests/fixtures/args.js 1`] = `
 false === false;
 null === null;
 undefined === undefined;
+console.log({"a":"b"});
+console.log([1,false,"hello"]);
 "
 `;
 

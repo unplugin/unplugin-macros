@@ -169,7 +169,13 @@ export async function transformMacros({
           if (!imports.has(id[0]) || scope.contains(id[0])) return
           const args = node.arguments.map((arg) => {
             if (isLiteralType(arg)) return resolveLiteral(arg)
-            throw new Error('Macro arguments must be literals.')
+            try {
+              if (isTypeOf(arg, ['ObjectExpression', 'ArrayExpression']))
+                return new Function(
+                  `return (${source.slice(arg.start!, arg.end!)})`,
+                )()
+            } catch {}
+            throw new Error('Macro arguments cannot be resolved.')
           })
 
           macros.push({
