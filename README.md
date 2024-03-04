@@ -8,7 +8,11 @@
 ## Installation
 
 ```bash
+# npm
 npm i -D unplugin-macros
+
+# jsr
+npx jsr add -D @unplugin/macros
 ```
 
 <details>
