@@ -1,4 +1,4 @@
-import { createUnplugin } from 'unplugin'
+import { type UnpluginInstance, createUnplugin } from 'unplugin'
 import { createFilter } from '@rollup/pluginutils'
 import { type ModuleNode, type ViteDevServer, createServer } from 'vite'
 import { ViteNodeServer } from 'vite-node/server'
@@ -9,7 +9,10 @@ import { type MacroContext, transformMacros } from './core'
 
 export type { Options, MacroContext } from './core'
 
-export default createUnplugin<Options | undefined, false>((rawOptions = {}) => {
+const plugin: UnpluginInstance<Options | undefined, false> = createUnplugin<
+  Options | undefined,
+  false
+>((rawOptions = {}) => {
   const options = resolveOptions(rawOptions)
   const filter = createFilter(options.include, options.exclude)
 
@@ -133,6 +136,7 @@ export default createUnplugin<Options | undefined, false>((rawOptions = {}) => {
     },
   }
 })
+export default plugin
 
 export function defineMacro<Args extends any[], Return>(
   fn: (this: MacroContext, ...args: Args) => Return,

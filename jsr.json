@@ -1,0 +1,20 @@
+{
+  "name": "@unplugin/macros",
+  "version": "0.10.0",
+  "exports": {
+    "./index": "./src/index.ts",
+    "./api": "./src/api.ts",
+    "./esbuild": "./src/esbuild.ts",
+    "./rollup": "./src/rollup.ts",
+    "./vite": "./src/vite.ts",
+    "./webpack": "./src/webpack.ts"
+  },
+  "exclude": [
+    "tests",
+    "examples",
+    "pnpm-lock.yaml",
+    "pnpm-workspace.yaml",
+    "tsup.config.ts",
+    "eslint.config.js"
+  ]
+}

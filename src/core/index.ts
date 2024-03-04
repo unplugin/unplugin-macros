@@ -60,7 +60,7 @@ export async function transformMacros({
   getRunner: () => Promise<ViteNodeRunner>
   deps: Map<string, Set<string>>
   attrs: Record<string, string>
-}) {
+}): Promise<{ code: string; map: any } | undefined> {
   const program = babelParse(source, getLang(id), {
     plugins: [['importAttributes', { deprecatedAssertSyntax: true }]],
   })
