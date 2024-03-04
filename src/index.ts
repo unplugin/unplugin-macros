@@ -1,3 +1,8 @@
+/**
+ * This entry file is for main unplugin.
+ * @module
+ */
+
 import { type UnpluginInstance, createUnplugin } from 'unplugin'
 import { createFilter } from '@rollup/pluginutils'
 import { type ModuleNode, type ViteDevServer, createServer } from 'vite'
@@ -9,6 +14,9 @@ import { type MacroContext, transformMacros } from './core'
 
 export type { Options, MacroContext } from './core'
 
+/**
+ * The main unplugin instance.
+ */
 const plugin: UnpluginInstance<Options | undefined, false> = createUnplugin<
   Options | undefined,
   false

@@ -1,8 +1,15 @@
 /**
- * @module
- *
  * This entry file is for Rollup plugin.
  *
+ * @module
+ */
+
+import unplugin from './index'
+
+/**
+ * Rollup plugin
+ *
+ * @example
  * ```ts
  * // rollup.config.js
  * import Macros from 'unplugin-macros/rollup'
@@ -12,7 +19,4 @@
  * }
  * ```
  */
-
-import unplugin from './index'
-
 export default unplugin.rollup
