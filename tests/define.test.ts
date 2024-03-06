@@ -1,5 +1,6 @@
 import { expectTypeOf, test } from 'vitest'
-import { type MacroContext, defineMacro } from '../src'
+import { defineMacro } from '../src/api'
+import type { MacroContext } from '../src'
 
 test('define', () => {
   const fn = defineMacro(function () {
