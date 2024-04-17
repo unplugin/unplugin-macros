@@ -1,6 +1,6 @@
 {
   "name": "@unplugin/macros",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "exports": {
     "./index": "./src/index.ts",
     "./api": "./src/api.ts",
@@ -10,6 +10,12 @@
     "./webpack": "./src/webpack.ts"
   },
   "publish": {
-    "include": ["src", "package.json", "jsr.json", "README.md", "LICENSE"]
+    "include": [
+      "src",
+      "package.json",
+      "jsr.json",
+      "README.md",
+      "LICENSE"
+    ]
   }
 }
