@@ -47,6 +47,14 @@ exports[`fixture > tests/fixtures/nested-object.js 1`] = `
 "
 `;
 
+exports[`fixture > tests/fixtures/node-builtin.js 1`] = `
+""LE" === 'LE'
+;("* text=auto eol=lf\\n") ===
+  // prettier-ignore
+  "* text=auto eol=lf\\n";
+"
+`;
+
 exports[`fixture > tests/fixtures/non-macros.js 1`] = `
 "function getRandom() {
   return Math.random()

@@ -1,3 +1,4 @@
+import { builtinModules } from 'node:module'
 import {
   type ImportBinding,
   type WithScope,
@@ -99,8 +100,16 @@ export async function transformMacros({
       const binding = imports.get(local)!
       const [, resolved] = await runner.resolveUrl(binding.source, id)
 
-      const module = await runner.executeFile(resolved)
-      let exported: any = module
+      let exported
+      if (
+        resolved.startsWith('node:') ||
+        builtinModules.includes(resolved.split('/')[0])
+      ) {
+        exported = await import(resolved)
+      } else {
+        const module = await runner.executeFile(resolved)
+        exported = module
+      }
 
       const props = [...keys]
       if (binding.imported !== '*') props.unshift(binding.imported)
