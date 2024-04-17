@@ -15,8 +15,8 @@ importers:
         specifier: ^0.12.1
         version: 0.12.1
       magic-string-ast:
-        specifier: ^0.4.1
-        version: 0.4.1
+        specifier: ^0.5.0
+        version: 0.5.0
       unplugin:
         specifier: ^1.10.1
         version: 1.10.1
@@ -1773,8 +1773,8 @@ packages:
     resolution: {integrity: sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==}
     engines: {node: '>=10'}
 
-  magic-string-ast@0.4.1:
-    resolution: {integrity: sha512-gc/BaCHfckvJWe4978wNTFuANbVr+xSBkqVpE3mUdzLCJ50i6Dwm8PwEQ+av+QqmzJ/I6LjZxCL+Sb7MGkmEyg==}
+  magic-string-ast@0.5.0:
+    resolution: {integrity: sha512-mxjxZ5zoR4+ybulZ7Z5qdZUTdAfiKJ1Il80kN/I4jWsHTTqNKZ9KsBa3Jepo+3U09I04qiyC2+7MZD8v4rJOoA==}
     engines: {node: '>=16.14.0'}
 
   magic-string@0.30.9:
@@ -4267,7 +4267,7 @@ snapshots:
     dependencies:
       yallist: 4.0.0
 
-  magic-string-ast@0.4.1:
+  magic-string-ast@0.5.0:
     dependencies:
       magic-string: 0.30.9
 
