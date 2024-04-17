@@ -10,11 +10,6 @@
     "./webpack": "./src/webpack.ts"
   },
   "publish": {
-    "include": [
-      "src",
-      "package.json",
-      "README.md",
-      "LICENSE"
-    ]
+    "include": ["src", "package.json", "jsr.json", "README.md", "LICENSE"]
   }
 }
