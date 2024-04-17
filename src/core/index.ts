@@ -13,7 +13,7 @@ import {
   walkAST,
   walkImportDeclaration,
 } from 'ast-kit'
-import { MagicString, generateTransform } from 'magic-string-ast'
+import { MagicStringAST, generateTransform } from 'magic-string-ast'
 import type { UnpluginBuildContext, UnpluginContext } from 'unplugin'
 import type { ImportAttribute, Node } from '@babel/types'
 import type { ViteNodeRunner } from 'vite-node/client'
@@ -73,7 +73,7 @@ export async function transformMacros({
   const program = babelParse(source, getLang(id), {
     plugins: [['importAttributes', { deprecatedAssertSyntax: true }]],
   })
-  const s = new MagicString(source)
+  const s = new MagicStringAST(source)
 
   const imports = new Map(Object.entries(recordImports()))
   const macros = collectMacros()
