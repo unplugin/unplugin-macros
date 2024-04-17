@@ -23,7 +23,8 @@ const { bar = 1 } = {};
 `;
 
 exports[`fixture > tests/fixtures/css.js 1`] = `
-"const style = {"color":"red"};
+"// prettier-ignore
+const style = {"color":"red"};
 "
 `;
 
