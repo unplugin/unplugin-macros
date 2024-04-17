@@ -3,6 +3,7 @@
   "version": "0.11.0",
   "packageManager": "pnpm@9.0.1",
   "description": "Macros for bundlers.",
+  "type": "module",
   "keywords": [
     "unplugin",
     "rollup",
@@ -24,32 +25,32 @@
     "dist"
   ],
   "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "require": "./dist/index.js",
-      "import": "./dist/index.mjs"
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js"
     },
     "./api": {
-      "require": "./dist/api.js",
-      "import": "./dist/api.mjs"
+      "require": "./dist/api.cjs",
+      "import": "./dist/api.js"
     },
     "./vite": {
-      "require": "./dist/vite.js",
-      "import": "./dist/vite.mjs"
+      "require": "./dist/vite.cjs",
+      "import": "./dist/vite.js"
     },
     "./webpack": {
-      "require": "./dist/webpack.js",
-      "import": "./dist/webpack.mjs"
+      "require": "./dist/webpack.cjs",
+      "import": "./dist/webpack.js"
     },
     "./rollup": {
-      "require": "./dist/rollup.js",
-      "import": "./dist/rollup.mjs"
+      "require": "./dist/rollup.cjs",
+      "import": "./dist/rollup.js"
     },
     "./esbuild": {
-      "require": "./dist/esbuild.js",
-      "import": "./dist/esbuild.mjs"
+      "require": "./dist/esbuild.cjs",
+      "import": "./dist/esbuild.js"
     },
     "./*": "./*"
   },
@@ -101,6 +102,6 @@
     "vue": "^3.4.23"
   },
   "engines": {
-    "node": ">=16.14.0"
+    "node": ">=18.12.0"
   }
 }
