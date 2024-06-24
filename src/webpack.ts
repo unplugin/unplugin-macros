@@ -17,4 +17,4 @@ import unplugin from './index'
  * }
  * ```
  */
-export default unplugin.webpack
+export default unplugin.webpack as typeof unplugin.webpack
