@@ -12,8 +12,8 @@ importers:
         specifier: ^5.1.0
         version: 5.1.0(rollup@4.18.0)
       ast-kit:
-        specifier: ^0.12.2
-        version: 0.12.2
+        specifier: ^1.0.0
+        version: 1.0.0
       magic-string-ast:
         specifier: ^0.6.1
         version: 0.6.1
@@ -1038,8 +1038,8 @@ packages:
   assertion-error@1.1.0:
     resolution: {integrity: sha512-jgsaNduz+ndvGyFt3uSuWqvy4lCnIJiovtouQN5JZHOKCS2QuhEdbcQHFhVksz2N2U9hXJo8odG7ETyWlEeuDw==}
 
-  ast-kit@0.12.2:
-    resolution: {integrity: sha512-es1zHFsnZ4Y4efz412nnrU3KvVAhgqy90a7Yt9Wpi5vQ3l4aYMOX0Qx4FD0elKr5ITEhiUGCSFcgGYf4YTuACg==}
+  ast-kit@1.0.0:
+    resolution: {integrity: sha512-Jv5Zs4DhU4QEYPvfVrEmdMuxCRMxsIVNfj4uqsBWyNM5wOaNMIfOwu55jH2DWnmr05iyCxPjbYGND1PNU40CuQ==}
     engines: {node: '>=16.14.0'}
 
   balanced-match@1.0.2:
@@ -2768,7 +2768,7 @@ snapshots:
   '@babel/template@7.24.0':
     dependencies:
       '@babel/code-frame': 7.24.2
-      '@babel/parser': 7.24.4
+      '@babel/parser': 7.24.7
       '@babel/types': 7.24.7
 
   '@babel/traverse@7.24.1':
@@ -2779,7 +2779,7 @@ snapshots:
       '@babel/helper-function-name': 7.23.0
       '@babel/helper-hoist-variables': 7.22.5
       '@babel/helper-split-export-declaration': 7.22.6
-      '@babel/parser': 7.24.4
+      '@babel/parser': 7.24.7
       '@babel/types': 7.24.7
       debug: 4.3.4
       globals: 11.12.0
@@ -3419,12 +3419,12 @@ snapshots:
       '@babel/core': 7.24.4
       '@babel/helper-module-imports': 7.22.15
       '@babel/helper-plugin-utils': 7.24.0
-      '@babel/parser': 7.24.4
+      '@babel/parser': 7.24.7
       '@vue/compiler-sfc': 3.4.23
 
   '@vue/compiler-core@3.4.23':
     dependencies:
-      '@babel/parser': 7.24.4
+      '@babel/parser': 7.24.7
       '@vue/shared': 3.4.23
       entities: 4.5.0
       estree-walker: 2.0.2
@@ -3450,7 +3450,7 @@ snapshots:
 
   '@vue/compiler-sfc@3.4.23':
     dependencies:
-      '@babel/parser': 7.24.4
+      '@babel/parser': 7.24.7
       '@vue/compiler-core': 3.4.23
       '@vue/compiler-dom': 3.4.23
       '@vue/compiler-ssr': 3.4.23
@@ -3556,7 +3556,7 @@ snapshots:
 
   assertion-error@1.1.0: {}
 
-  ast-kit@0.12.2:
+  ast-kit@1.0.0:
     dependencies:
       '@babel/parser': 7.24.7
       pathe: 1.1.2
