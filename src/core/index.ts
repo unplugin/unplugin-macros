@@ -80,12 +80,11 @@ export async function transformMacros({
 
   const imports = new Map(Object.entries(recordImports()))
   const macros = collectMacros()
-  if (macros.length === 0) {
+  if (macros.length > 0) {
+    await executeMacros()
+  } else {
     deps.delete(id)
-    return
   }
-
-  await executeMacros()
 
   return generateTransform(s, id)
 

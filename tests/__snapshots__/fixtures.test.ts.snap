@@ -57,15 +57,7 @@ exports[`fixture > tests/fixtures/node-builtin.js 1`] = `
 `;
 
 exports[`fixture > tests/fixtures/non-macros.js 1`] = `
-"function getRandom() {
-  return Math.random()
-}
-
-function toString(v) {
-  return v.toString()
-}
-
-{
+"{
   const getRandom = () => 2;
   getRandom() === 2;
 }
