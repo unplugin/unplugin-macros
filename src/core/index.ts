@@ -1,6 +1,7 @@
 import { builtinModules } from 'node:module'
 import {
   type ImportBinding,
+  TS_NODE_TYPES,
   type WithScope,
   attachScopes,
   babelParse,
@@ -20,6 +21,7 @@ import type { ImportAttribute, Node } from '@babel/types'
 import type { ViteNodeRunner } from 'vite-node/client'
 
 export * from './options'
+export * from './define'
 
 /**
  * Represents the context object passed to macros.
@@ -158,7 +160,10 @@ export async function transformMacros({
         parent && parentStack.push(parent)
         if (node.scope) scope = node.scope
 
-        if (node.type.startsWith('TS')) {
+        if (
+          node.type.startsWith('TS') &&
+          !TS_NODE_TYPES.includes(node.type as any)
+        ) {
           this.skip()
           return
         }
@@ -261,16 +266,4 @@ function checkImportAttributes(
   return Object.entries(expected).every(
     ([key, expectedValue]) => actualAttrs[key] === expectedValue,
   )
-}
-
-/**
- * A TypeScript helper function that defines a macro.
- *
- * @param fn - The function that represents the macro.
- * @returns A function that can be called with the macro arguments.
- */
-export function defineMacro<Args extends any[], Return>(
-  fn: (this: MacroContext, ...args: Args) => Return,
-): (...args: Args) => Return {
-  return fn
 }

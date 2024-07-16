@@ -93,3 +93,8 @@ exports[`fixture > tests/fixtures/promise.js 1`] = `
 const b = "ok";
 "
 `;
+
+exports[`fixture > tests/fixtures/typescript.ts 1`] = `
+"10;
+"
+`;
