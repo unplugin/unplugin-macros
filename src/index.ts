@@ -5,12 +5,12 @@
 
 import { type UnpluginInstance, createUnplugin } from 'unplugin'
 import { createFilter } from '@rollup/pluginutils'
-import { type ModuleNode, type ViteDevServer, createServer } from 'vite'
 import { ViteNodeServer } from 'vite-node/server'
 import { ViteNodeRunner } from 'vite-node/client'
 import { installSourcemapsSupport } from 'vite-node/source-map'
 import { type Options, resolveOptions } from './core/options'
 import { transformMacros } from './core'
+import type { ModuleNode, ViteDevServer } from 'vite'
 
 export type { Options, MacroContext } from './core'
 
@@ -47,6 +47,7 @@ const plugin: UnpluginInstance<Options | undefined, false> = createUnplugin<
   }
 
   async function initServer() {
+    const { createServer } = await import('vite')
     const server = await createServer({
       ...options.viteConfig,
       optimizeDeps: {
