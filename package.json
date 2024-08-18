@@ -1,7 +1,7 @@
 {
   "name": "unplugin-macros",
   "version": "0.13.2",
-  "packageManager": "pnpm@9.4.0",
+  "packageManager": "pnpm@9.7.1",
   "description": "Macros for bundlers.",
   "type": "module",
   "keywords": [
@@ -78,30 +78,30 @@
   },
   "dependencies": {
     "@rollup/pluginutils": "^5.1.0",
-    "ast-kit": "^1.0.0",
-    "magic-string-ast": "^0.6.1",
-    "unplugin": "^1.10.1",
-    "vite": "^5.3.1",
-    "vite-node": "^2.0.3"
+    "ast-kit": "^1.0.1",
+    "magic-string-ast": "^0.6.2",
+    "unplugin": "^1.12.2",
+    "vite": "^5.4.1",
+    "vite-node": "^2.0.5"
   },
   "devDependencies": {
-    "@babel/types": "^7.24.7",
-    "@sxzz/eslint-config": "^3.13.0",
+    "@babel/types": "^7.25.2",
+    "@sxzz/eslint-config": "^3.17.1",
     "@sxzz/prettier-config": "^2.0.2",
     "@types/dedent": "^0.7.2",
-    "@types/node": "^20.14.8",
-    "@vue-macros/test-utils": "^1.4.0",
-    "bumpp": "^9.4.1",
+    "@types/node": "^20.16.0",
+    "@vue-macros/test-utils": "^1.6.0",
+    "bumpp": "^9.5.1",
     "dedent": "^1.5.3",
-    "eslint": "^9.5.0",
+    "eslint": "^9.9.0",
     "fast-glob": "^3.3.2",
-    "prettier": "^3.3.2",
-    "rollup": "^4.18.0",
-    "tsup": "^8.1.0",
-    "tsx": "^4.15.7",
-    "typescript": "^5.5.2",
-    "vitest": "^2.0.3",
-    "vue": "^3.4.30"
+    "prettier": "^3.3.3",
+    "rollup": "^4.21.0",
+    "tsup": "^8.2.4",
+    "tsx": "^4.17.0",
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.5",
+    "vue": "^3.4.38"
   },
   "engines": {
     "node": ">=18.12.0"
