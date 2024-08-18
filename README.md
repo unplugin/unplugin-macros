@@ -76,7 +76,7 @@ module.exports = {
 
 ```js
 // main.js
-import { getRandom, buildTime } from './macros' with { type: 'macro' }
+import { buildTime, getRandom } from './macros' with { type: 'macro' }
 
 getRandom() // Will be replaced with a random number at build time
 buildTime // Will be replaced with the timestamp at the build time
@@ -99,6 +99,24 @@ Import Attributes syntax is supported in TypeScript >= 5.3, but you can replace 
 ### ESLint
 
 ESLint is not supported Import Attributes syntax yet, but you can use [`@babel/eslint-parser`](https://www.npmjs.com/package/@babel/eslint-parser) or [`@typescript-eslint/parser`](https://typescript-eslint.io/packages/parser/).
+
+```js
+// eslint.config.js
+import parser from '@babel/eslint-parser'
+
+export default [
+  {
+    // ...
+    languageOptions: {
+      parser,
+      parserOptions: {
+        requireConfigFile: false,
+        babelOptions: { parserOpts: { plugins: ['importAttributes'] } },
+      },
+    },
+  },
+]
+```
 
 ## Options
 
