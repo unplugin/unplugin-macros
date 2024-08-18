@@ -3,16 +3,16 @@
  * @module
  */
 
-import { type UnpluginInstance, createUnplugin } from 'unplugin'
 import { createFilter } from '@rollup/pluginutils'
-import { ViteNodeServer } from 'vite-node/server'
+import { createUnplugin, type UnpluginInstance } from 'unplugin'
 import { ViteNodeRunner } from 'vite-node/client'
+import { ViteNodeServer } from 'vite-node/server'
 import { installSourcemapsSupport } from 'vite-node/source-map'
-import { type Options, resolveOptions } from './core/options'
 import { transformMacros } from './core'
+import { resolveOptions, type Options } from './core/options'
 import type { ModuleNode, ViteDevServer } from 'vite'
 
-export type { Options, MacroContext } from './core'
+export type { MacroContext, Options } from './core'
 
 /**
  * The main unplugin instance.

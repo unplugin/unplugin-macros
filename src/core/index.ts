@@ -1,8 +1,5 @@
 import { builtinModules } from 'node:module'
 import {
-  type ImportBinding,
-  TS_NODE_TYPES,
-  type WithScope,
   attachScopes,
   babelParse,
   getLang,
@@ -12,12 +9,15 @@ import {
   resolveIdentifier,
   resolveLiteral,
   resolveObjectKey,
+  TS_NODE_TYPES,
   walkAST,
   walkImportDeclaration,
+  type ImportBinding,
+  type WithScope,
 } from 'ast-kit'
-import { MagicStringAST, generateTransform } from 'magic-string-ast'
-import type { UnpluginBuildContext, UnpluginContext } from 'unplugin'
+import { generateTransform, MagicStringAST } from 'magic-string-ast'
 import type { ImportAttribute, Node } from '@babel/types'
+import type { UnpluginBuildContext, UnpluginContext } from 'unplugin'
 import type { ViteNodeRunner } from 'vite-node/client'
 
 export * from './options'
@@ -54,7 +54,13 @@ type Macro = CallMacro | IdentifierMacro
 
 /**
  * Transforms macros in the given source code.
- * @param options - The transformation context options.
+ * @param param0 - The transformation options.
+ * @param param0.source - The source code to transform.
+ * @param param0.id - The filename of the source file.
+ * @param param0.unpluginContext - The unplugin context.
+ * @param param0.getRunner - A function to get the ViteNodeRunner instance.
+ * @param param0.deps - The dependencies of the source file.
+ * @param param0.attrs - The import attributes to match.
  * @returns The transformed code and source map, or undefined if no macros were found.
  */
 export async function transformMacros({

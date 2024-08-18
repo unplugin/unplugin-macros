@@ -1,5 +1,5 @@
-import type { InlineConfig, ViteDevServer } from 'vite'
 import type { FilterPattern } from '@rollup/pluginutils'
+import type { InlineConfig, ViteDevServer } from 'vite'
 
 /**
  * Represents the options for the plugin.

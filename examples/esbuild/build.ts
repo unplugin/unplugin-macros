@@ -1,4 +1,4 @@
-/* eslint-disable no-console, unicorn/prefer-top-level-await */
+/* eslint-disable no-console */
 
 import { build } from 'esbuild'
 import Macros from '../../src/esbuild'

@@ -78,7 +78,7 @@
   },
   "dependencies": {
     "@rollup/pluginutils": "^5.1.0",
-    "ast-kit": "^1.0.1",
+    "ast-kit": "^1.1.0",
     "magic-string-ast": "^0.6.2",
     "unplugin": "^1.12.2",
     "vite": "^5.4.1",
