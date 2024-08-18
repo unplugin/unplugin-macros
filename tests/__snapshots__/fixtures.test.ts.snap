@@ -1,7 +1,8 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`fixture > tests/fixtures/args.js 1`] = `
-"0 === 0;
+"// args.js
+0 === 0;
 "1" === '1';
 false === false;
 null === null;
@@ -12,7 +13,8 @@ console.log([1,false,"hello"]);
 `;
 
 exports[`fixture > tests/fixtures/basic.js 1`] = `
-"0.5 === 0.5;
+"// basic.js
+0.5 === 0.5;
 1 === 1;
 2 === 2;
 3 === 3;
@@ -23,33 +25,39 @@ const { bar = 1 } = {};
 `;
 
 exports[`fixture > tests/fixtures/css.js 1`] = `
-"// prettier-ignore
+"// css.js
+// prettier-ignore
 const style = {"color":"red"};
 "
 `;
 
 exports[`fixture > tests/fixtures/ctx.js 1`] = `
-""ctx.js" === 'ctx.js';
+"// ctx.js
+"ctx.js" === 'ctx.js';
 "
 `;
 
 exports[`fixture > tests/fixtures/dedent.js 1`] = `
-"const msg = "if (true) {\\n  const a = 'b'\\n}";
+"// dedent.js
+const msg = "if (true) {\\n  const a = 'b'\\n}";
 "
 `;
 
 exports[`fixture > tests/fixtures/import-namespace.js 1`] = `
-"0.5 === 0.5;
+"// import-namespace.js
+0.5 === 0.5;
 "
 `;
 
 exports[`fixture > tests/fixtures/nested-object.js 1`] = `
-""foo" === 'foo';
+"// nested-object.js
+"foo" === 'foo';
 "
 `;
 
 exports[`fixture > tests/fixtures/node-builtin.js 1`] = `
-""LE" === 'LE'
+"// node-builtin.js
+"LE" === 'LE'
 ;("* text=auto eol=lf\\n") ===
   // prettier-ignore
   "* text=auto eol=lf\\n";
@@ -57,7 +65,8 @@ exports[`fixture > tests/fixtures/node-builtin.js 1`] = `
 `;
 
 exports[`fixture > tests/fixtures/non-macros.js 1`] = `
-"{
+"// non-macros.js
+{
   const getRandom = () => 2;
   getRandom() === 2;
 }
@@ -81,12 +90,14 @@ class TestCls {
 `;
 
 exports[`fixture > tests/fixtures/promise.js 1`] = `
-"const a = "ok";
+"// promise.js
+const a = "ok";
 const b = "ok";
 "
 `;
 
 exports[`fixture > tests/fixtures/typescript.ts 1`] = `
-"10;
+"// typescript.js
+10;
 "
 `;
