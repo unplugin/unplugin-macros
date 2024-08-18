@@ -9,8 +9,8 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "typescript": "^5.5.2",
+    "typescript": "^5.5.4",
     "unplugin-macros": "workspace:*",
-    "vite": "^5.3.1"
+    "vite": "^5.4.1"
   }
 }
