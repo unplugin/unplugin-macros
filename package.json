@@ -48,6 +48,10 @@
       "require": "./dist/rollup.cjs",
       "import": "./dist/rollup.js"
     },
+    "./rolldown": {
+      "require": "./dist/rollup.cjs",
+      "import": "./dist/rollup.js"
+    },
     "./esbuild": {
       "require": "./dist/esbuild.cjs",
       "import": "./dist/esbuild.js"
