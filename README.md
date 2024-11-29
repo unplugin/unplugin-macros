@@ -94,29 +94,12 @@ See more in [Bun Macros](https://bun.sh/blog/bun-macros).
 
 ### TypeScript
 
-Import Attributes syntax is supported in TypeScript >= 5.3, but you can replace `with` keyword with `assert`, which is supported in TypeScript >= 4.5.
+Import Attributes syntax is supported in TypeScript 5.3 and above.
+However, you can use `assert` keyword instead of `with`, which is supported in TypeScript 4.5 and above.
 
 ### ESLint
 
-ESLint is not supported Import Attributes syntax yet, but you can use [`@babel/eslint-parser`](https://www.npmjs.com/package/@babel/eslint-parser) or [`@typescript-eslint/parser`](https://typescript-eslint.io/packages/parser/).
-
-```js
-// eslint.config.js
-import parser from '@babel/eslint-parser'
-
-export default [
-  {
-    // ...
-    languageOptions: {
-      parser,
-      parserOptions: {
-        requireConfigFile: false,
-        babelOptions: { parserOpts: { plugins: ['importAttributes'] } },
-      },
-    },
-  },
-]
-```
+Import Attributes syntax is supported in ESLint v9.14.0.
 
 ## Options
 
