@@ -24,7 +24,7 @@ const plugin: UnpluginInstance<Options | undefined, false> = createUnplugin<
   const options = resolveOptions(rawOptions)
   const filter = createFilter(options.include, options.exclude)
 
-  let externalServer: boolean
+  let isBuiltinServer: boolean
   let server: ViteDevServer
   let node: ViteNodeServer
   let runner: ViteNodeRunner | undefined
@@ -35,13 +35,8 @@ const plugin: UnpluginInstance<Options | undefined, false> = createUnplugin<
   function init() {
     if (initPromise) return initPromise
     return (initPromise = (async () => {
-      externalServer = !!options.viteServer
-      if (options.viteServer) {
-        server = options.viteServer
-        externalServer = false
-      } else {
-        server = await initServer()
-      }
+      isBuiltinServer = !options.viteServer
+      server = options.viteServer || (await initServer())
       initRunner()
     })())
   }
@@ -95,9 +90,10 @@ const plugin: UnpluginInstance<Options | undefined, false> = createUnplugin<
     enforce: options.enforce,
 
     buildEnd() {
-      if (!externalServer && server)
+      if (isBuiltinServer && server) {
         // close the built-in vite server
         return server.close()
+      }
     },
 
     transformInclude(id) {
