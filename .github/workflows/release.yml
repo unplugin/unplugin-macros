@@ -35,8 +35,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        run: corepack enable
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4.0.0
 
       - name: Set node
         uses: actions/setup-node@v4
@@ -44,8 +44,8 @@ jobs:
           node-version: lts/*
           cache: pnpm
 
-      - name: Install dependencies
-        run: pnpm install
+      - name: Install
+        run: pnpm i
 
       - name: Publish package
         run: npx jsr publish
