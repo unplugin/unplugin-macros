@@ -1,7 +1,7 @@
 {
   "name": "unplugin-macros",
   "version": "0.14.2",
-  "packageManager": "pnpm@10.2.0",
+  "packageManager": "pnpm@10.2.1",
   "description": "Macros for bundlers.",
   "type": "module",
   "keywords": [
@@ -32,6 +32,7 @@
     "./api": "./dist/api.js",
     "./vite": "./dist/vite.js",
     "./webpack": "./dist/webpack.js",
+    "./rspack": "./dist/rspack.js",
     "./rollup": "./dist/rollup.js",
     "./rolldown": "./dist/rolldown.js",
     "./esbuild": "./dist/esbuild.js",

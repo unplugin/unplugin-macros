@@ -19,4 +19,6 @@ import unplugin from './index'
  * }
  * ```
  */
-export default unplugin.rolldown as typeof unplugin.rolldown
+const rolldown = unplugin.rolldown as typeof unplugin.rolldown
+export default rolldown
+export { rolldown as 'module.exports' }

@@ -6,8 +6,10 @@
     "./api": "./src/api.ts",
     "./esbuild": "./src/esbuild.ts",
     "./rollup": "./src/rollup.ts",
+    "./rolldown": "./src/rolldown.ts",
     "./vite": "./src/vite.ts",
-    "./webpack": "./src/webpack.ts"
+    "./webpack": "./src/webpack.ts",
+    "./rspack": "./src/rspack.ts"
   },
   "publish": {
     "include": [
