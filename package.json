@@ -1,6 +1,6 @@
 {
   "name": "unplugin-macros",
-  "version": "0.15.0",
+  "version": "0.15.1",
   "packageManager": "pnpm@10.2.1",
   "description": "Macros for bundlers.",
   "type": "module",
