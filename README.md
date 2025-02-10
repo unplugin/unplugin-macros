@@ -95,7 +95,6 @@ See more in [Bun Macros](https://bun.sh/blog/bun-macros).
 ### TypeScript
 
 Import Attributes syntax is supported in TypeScript 5.3 and above.
-However, you can use `assert` keyword instead of `with`, which is supported in TypeScript 4.5 and above.
 
 ### ESLint
 

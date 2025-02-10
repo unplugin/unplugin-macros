@@ -79,9 +79,7 @@ export async function transformMacros({
   deps: Map<string, Set<string>>
   attrs: Record<string, string>
 }): Promise<{ code: string; map: any } | undefined> {
-  const program = babelParse(source, getLang(id), {
-    plugins: [['importAttributes', { deprecatedAssertSyntax: true }]],
-  })
+  const program = babelParse(source, getLang(id))
   const s = new MagicStringAST(source)
 
   const imports = new Map(Object.entries(recordImports()))
