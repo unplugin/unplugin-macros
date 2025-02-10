@@ -43,6 +43,8 @@ const msg = "if (true) {\\n  const a = 'b'\\n}";
 "
 `;
 
+exports[`fixture > tests/fixtures/error-assert.js 1`] = `[SyntaxError: The \`assert\` keyword in import attributes is deprecated and it has been replaced by the \`with\` keyword. You can enable the \`deprecatedImportAssert\` parser plugin to suppress this error. (1:42)]`;
+
 exports[`fixture > tests/fixtures/import-namespace.js 1`] = `
 "// import-namespace.js
 0.5 === 0.5;
