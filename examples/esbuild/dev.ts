@@ -7,12 +7,12 @@ const ctx = await context({
   entryPoints: ['src/main.ts'],
   bundle: true,
   outdir: 'dist',
-  plugins: [((Macros as any).default as any as typeof Macros)()],
+  plugins: [Macros()],
   format: 'esm',
 })
 
-const { host, port } = await ctx.serve({
+const { hosts, port } = await ctx.serve({
   servedir: 'dist',
 })
 
-console.log(`http://${host}:${port}`)
+console.log(`http://${hosts[0]}:${port}`)

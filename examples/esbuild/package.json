@@ -1,9 +1,10 @@
 {
   "version": "1.0.0",
+  "type": "module",
   "scripts": {
     "build": "tsx build.ts",
     "watch": "tsx watch build.ts",
-    "dev": "tsx watch dev.mts"
+    "dev": "tsx watch dev.ts"
   },
   "devDependencies": {
     "esbuild": "^0.25.0",
