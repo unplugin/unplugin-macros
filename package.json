@@ -21,6 +21,7 @@
     "url": "git+https://github.com/unplugin/unplugin-macros.git"
   },
   "author": "三咲智子 Kevin Deng <sxzz@sxzz.moe>",
+  "funding": "https://github.com/sponsors/sxzz",
   "files": [
     "dist"
   ],
