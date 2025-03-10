@@ -7,7 +7,7 @@
     "dev": "tsx watch dev.ts"
   },
   "devDependencies": {
-    "esbuild": "^0.25.0",
+    "esbuild": "^0.25.1",
     "tsx": "^4.19.3"
   }
 }
