@@ -72,7 +72,7 @@
   "devDependencies": {
     "@babel/eslint-parser": "^7.26.8",
     "@babel/types": "^7.26.9",
-    "@sxzz/eslint-config": "^5.3.0",
+    "@sxzz/eslint-config": "^6.0.1",
     "@sxzz/prettier-config": "^2.2.1",
     "@sxzz/test-utils": "^0.5.1",
     "@types/dedent": "^0.7.2",
