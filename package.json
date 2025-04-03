@@ -1,7 +1,7 @@
 {
   "name": "unplugin-macros",
   "version": "0.16.2",
-  "packageManager": "pnpm@10.6.5",
+  "packageManager": "pnpm@10.7.1",
   "description": "Macros for bundlers.",
   "type": "module",
   "keywords": [
@@ -63,30 +63,30 @@
   },
   "dependencies": {
     "ast-kit": "^1.4.2",
-    "magic-string-ast": "^0.8.0",
+    "magic-string-ast": "^0.9.1",
     "unplugin": "^2.2.2",
     "unplugin-utils": "^0.2.4",
-    "vite": "^6.2.2",
-    "vite-node": "^3.0.9"
+    "vite": "^6.2.5",
+    "vite-node": "^3.1.1"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "^7.26.10",
-    "@babel/types": "^7.26.10",
-    "@sxzz/eslint-config": "^6.1.0",
+    "@babel/eslint-parser": "^7.27.0",
+    "@babel/types": "^7.27.0",
+    "@sxzz/eslint-config": "^6.1.1",
     "@sxzz/prettier-config": "^2.2.1",
-    "@sxzz/test-utils": "^0.5.2",
+    "@sxzz/test-utils": "^0.5.4",
     "@types/dedent": "^0.7.2",
-    "@types/node": "^22.13.11",
+    "@types/node": "^22.14.0",
     "bumpp": "^10.1.0",
     "dedent": "^1.5.3",
     "eslint": "^9.23.0",
     "fast-glob": "^3.3.3",
     "prettier": "^3.5.3",
-    "rollup": "^4.37.0",
-    "tsdown": "^0.6.9",
+    "rollup": "^4.39.0",
+    "tsdown": "^0.7.3",
     "tsx": "^4.19.3",
     "typescript": "^5.8.2",
-    "vitest": "^3.0.9",
+    "vitest": "^3.1.1",
     "vue": "^3.5.13"
   },
   "engines": {
