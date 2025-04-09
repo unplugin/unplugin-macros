@@ -4,7 +4,6 @@
  */
 
 import { createUnplugin, type UnpluginInstance } from 'unplugin'
-import { createFilter } from 'unplugin-utils'
 import { ViteNodeRunner } from 'vite-node/client'
 import { ViteNodeServer } from 'vite-node/server'
 import { installSourcemapsSupport } from 'vite-node/source-map'
@@ -21,8 +20,7 @@ const plugin: UnpluginInstance<Options | undefined, false> = createUnplugin<
   Options | undefined,
   false
 >((rawOptions = {}) => {
-  const options = resolveOptions(rawOptions)
-  const filter = createFilter(options.include, options.exclude)
+  const { include, exclude, ...options } = resolveOptions(rawOptions)
 
   let isBuiltinServer: boolean
   let server: ViteDevServer
@@ -96,19 +94,18 @@ const plugin: UnpluginInstance<Options | undefined, false> = createUnplugin<
       }
     },
 
-    transformInclude(id) {
-      return filter(id)
-    },
-
-    transform(source, id) {
-      return transformMacros({
-        source,
-        id,
-        getRunner,
-        deps,
-        attrs: options.attrs,
-        unpluginContext: this,
-      })
+    transform: {
+      filter: { id: { include, exclude } },
+      handler(source, id) {
+        return transformMacros({
+          source,
+          id,
+          getRunner,
+          deps,
+          attrs: options.attrs,
+          unpluginContext: this,
+        })
+      },
     },
 
     vite: {

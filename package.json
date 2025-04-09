@@ -1,7 +1,7 @@
 {
   "name": "unplugin-macros",
   "version": "0.16.2",
-  "packageManager": "pnpm@10.7.1",
+  "packageManager": "pnpm@10.8.0",
   "description": "Macros for bundlers.",
   "type": "module",
   "keywords": [
@@ -64,8 +64,7 @@
   "dependencies": {
     "ast-kit": "^1.4.2",
     "magic-string-ast": "^0.9.1",
-    "unplugin": "^2.2.2",
-    "unplugin-utils": "^0.2.4",
+    "unplugin": "^2.3.0",
     "vite": "^6.2.5",
     "vite-node": "^3.1.1"
   },
