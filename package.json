@@ -62,31 +62,31 @@
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
-    "ast-kit": "^2.0.0",
+    "ast-kit": "^2.1.0",
     "magic-string-ast": "^0.9.1",
-    "unplugin": "^2.3.4",
+    "unplugin": "^2.3.5",
     "vite": "^6.3.5",
     "vite-node": "^3.1.4"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.27.1",
-    "@babel/types": "^7.27.1",
-    "@sxzz/eslint-config": "^7.0.1",
+    "@babel/types": "^7.27.3",
+    "@sxzz/eslint-config": "^7.0.2",
     "@sxzz/prettier-config": "^2.2.1",
     "@sxzz/test-utils": "^0.5.6",
     "@types/dedent": "^0.7.2",
-    "@types/node": "^22.15.21",
+    "@types/node": "^22.15.29",
     "bumpp": "^10.1.1",
     "dedent": "^1.6.0",
-    "eslint": "^9.27.0",
+    "eslint": "^9.28.0",
     "fast-glob": "^3.3.3",
     "prettier": "^3.5.3",
     "rollup": "^4.41.1",
-    "tsdown": "^0.12.3",
+    "tsdown": "^0.12.6",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3",
     "vitest": "^3.1.4",
-    "vue": "^3.5.14"
+    "vue": "^3.5.16"
   },
   "engines": {
     "node": ">=20.18.0"
