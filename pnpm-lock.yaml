@@ -12,8 +12,8 @@ importers:
         specifier: ^2.1.0
         version: 2.1.0
       magic-string-ast:
-        specifier: ^0.9.1
-        version: 0.9.1
+        specifier: ^1.0.0
+        version: 1.0.0
       unplugin:
         specifier: ^2.3.5
         version: 2.3.5
@@ -1769,8 +1769,8 @@ packages:
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
 
-  magic-string-ast@0.9.1:
-    resolution: {integrity: sha512-18dv2ZlSSgJ/jDWlZGKfnDJx56ilNlYq9F7NnwuWTErsmYmqJ2TWE4l1o2zlUHBYUGBy3tIhPCC1gxq8M5HkMA==}
+  magic-string-ast@1.0.0:
+    resolution: {integrity: sha512-8rbuNizut2gW94kv7pqgt0dvk+AHLPVIm0iJtpSgQJ9dx21eWx5SBel8z3jp1xtC0j6/iyK3AWGhAR1H61s7LA==}
     engines: {node: '>=20.18.0'}
 
   magic-string@0.30.17:
@@ -4154,7 +4154,7 @@ snapshots:
     dependencies:
       yallist: 3.1.1
 
-  magic-string-ast@0.9.1:
+  magic-string-ast@1.0.0:
     dependencies:
       magic-string: 0.30.17
 
