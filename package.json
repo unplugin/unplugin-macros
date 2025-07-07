@@ -65,7 +65,7 @@
     "ast-kit": "^2.1.1",
     "magic-string-ast": "^1.0.0",
     "unplugin": "^2.3.5",
-    "vite": "^6.3.5",
+    "vite": "^7.0.2",
     "vite-node": "^3.2.4"
   },
   "devDependencies": {
