@@ -65,28 +65,28 @@
     "ast-kit": "^2.1.1",
     "magic-string-ast": "^1.0.0",
     "unplugin": "^2.3.5",
-    "vite": "^7.0.5",
+    "vite": "^7.0.6",
     "vite-node": "^3.2.4"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.28.0",
-    "@babel/types": "^7.28.1",
-    "@sxzz/eslint-config": "^7.0.6",
+    "@babel/types": "^7.28.2",
+    "@sxzz/eslint-config": "^7.1.0",
     "@sxzz/prettier-config": "^2.2.3",
     "@sxzz/test-utils": "^0.5.7",
     "@types/dedent": "^0.7.2",
-    "@types/node": "^24.0.15",
+    "@types/node": "^24.1.0",
     "bumpp": "^10.2.0",
     "dedent": "^1.6.0",
-    "eslint": "^9.31.0",
+    "eslint": "^9.32.0",
     "fast-glob": "^3.3.3",
     "prettier": "^3.6.2",
-    "rollup": "^4.45.1",
-    "tsdown": "^0.12.9",
+    "rollup": "^4.46.1",
+    "tsdown": "^0.13.0",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
     "vitest": "^3.2.4",
-    "vue": "^3.5.17"
+    "vue": "^3.5.18"
   },
   "engines": {
     "node": ">=20.18.0"
