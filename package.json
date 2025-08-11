@@ -62,10 +62,10 @@
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
-    "ast-kit": "^2.1.1",
-    "magic-string-ast": "^1.0.0",
+    "ast-kit": "^2.1.2",
+    "magic-string-ast": "^1.0.2",
     "unplugin": "^2.3.5",
-    "vite": "^7.0.6",
+    "vite": "^7.1.1",
     "vite-node": "^3.2.4"
   },
   "devDependencies": {
@@ -75,14 +75,14 @@
     "@sxzz/prettier-config": "^2.2.3",
     "@sxzz/test-utils": "^0.5.9",
     "@types/dedent": "^0.7.2",
-    "@types/node": "^24.1.0",
+    "@types/node": "^24.2.1",
     "bumpp": "^10.2.2",
     "dedent": "^1.6.0",
-    "eslint": "^9.32.0",
+    "eslint": "^9.33.0",
     "fast-glob": "^3.3.3",
     "prettier": "^3.6.2",
     "rollup": "^4.46.2",
-    "tsdown": "^0.13.2",
+    "tsdown": "^0.14.0",
     "tsx": "^4.20.3",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4",
