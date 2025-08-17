@@ -20,7 +20,7 @@ import {
   MagicStringAST,
   type CodeTransform,
 } from 'magic-string-ast'
-import type { ImportAttribute, Node } from '@babel/types'
+import type * as t from '@babel/types'
 import type { UnpluginBuildContext, UnpluginContext } from 'unplugin'
 import type { ViteNodeRunner } from 'vite-node/client'
 
@@ -43,13 +43,13 @@ export interface MacroContext {
 }
 
 export interface MacroBase {
-  node: Node
+  node: t.Node
   id: string[]
   isAwait: boolean
 }
 export interface CallMacro extends MacroBase {
   type: 'call'
-  args: any[]
+  args: t.Node[]
 }
 export interface IdentifierMacro extends MacroBase {
   type: 'identifier'
@@ -78,82 +78,118 @@ export async function transformMacros(
 
   const imports = new Map(Object.entries(recordImports()))
   const macros = collectMacros()
+  const skip = new Set<Macro>()
+
   if (macros.length > 0) {
-    await executeMacros()
+    const runner = await getRunner()
+    deps.set(id, new Set())
+
+    for (const macro of macros) {
+      if (skip.has(macro)) {
+        continue
+      }
+
+      const result = await executeMacro(macro, runner, id)
+      const text = result === undefined ? 'undefined' : JSON.stringify(result)
+      s.overwriteNode(macro.node, text)
+    }
   } else {
     deps.delete(id)
   }
 
   return generateTransform(s, id)
 
-  async function executeMacros() {
-    const runner = await getRunner()
-    deps.set(id, new Set())
+  async function executeMacro(
+    macro: Macro,
+    runner: ViteNodeRunner,
+    id: string,
+  ): Promise<unknown> {
+    const {
+      id: [local, ...keys],
+      isAwait,
+    } = macro
+    const binding = imports.get(local)!
+    const [, resolved] = await runner.resolveUrl(binding.source, id)
 
-    for (const macro of macros) {
-      const {
-        node,
-        id: [local, ...keys],
-        isAwait,
-      } = macro
-      const binding = imports.get(local)!
-      const [, resolved] = await runner.resolveUrl(binding.source, id)
-
-      let exported
-      if (
-        resolved.startsWith('node:') ||
-        builtinModules.includes(resolved.split('/')[0])
-      ) {
-        exported = await import(resolved)
-      } else {
-        const module = await runner.executeFile(resolved)
-        exported = module
-      }
-
-      const props = [...keys]
-      if (binding.imported !== '*') props.unshift(binding.imported)
-      for (const key of props) {
-        exported = exported?.[key]
-      }
-
-      if (!exported) {
-        throw new Error(`Macro ${local} is not existed.`)
-      }
-
-      let ret: any
-      if (macro.type === 'call') {
-        const ctx: MacroContext = {
-          id,
-          source,
-          emitFile: unpluginContext.emitFile,
-
-          unpluginContext,
-        }
-        ret = (exported as Function).apply(ctx, macro.args)
-      } else {
-        ret = exported
-      }
-
-      if (isAwait) {
-        ret = await ret
-      }
-
-      s.overwriteNode(
-        node,
-        ret === undefined ? 'undefined' : JSON.stringify(ret),
-      )
-
-      deps.get(id)!.add(resolved)
+    let exported
+    if (resolved.startsWith('node:') || builtinModules.includes(resolved)) {
+      exported = await import(resolved)
+    } else {
+      const module = await runner.executeFile(resolved)
+      exported = module
     }
+
+    const props = [...keys]
+    if (binding.imported !== '*') props.unshift(binding.imported)
+    for (const key of props) {
+      exported = exported?.[key]
+    }
+
+    if (!exported) {
+      throw new Error(`Macro ${local} is not existed.`)
+    }
+
+    let result: any
+    if (macro.type === 'call') {
+      const ctx: MacroContext = {
+        id,
+        source,
+        emitFile: unpluginContext.emitFile,
+
+        unpluginContext,
+      }
+
+      const args: any[] = []
+      for (const arg of macro.args) {
+        if (isLiteralType(arg)) {
+          args.push(resolveLiteral(arg))
+          continue
+        }
+
+        const macro = macros.find((macro) => macro.node === arg)
+        if (macro) {
+          skip.add(macro)
+          args.push(await executeMacro(macro, runner, id))
+          continue
+        }
+
+        try {
+          if (isTypeOf(arg, ['ObjectExpression', 'ArrayExpression'])) {
+            args.push(
+              new Function(`return (${source.slice(arg.start!, arg.end!)})`)(),
+            )
+            continue
+          }
+        } catch {}
+
+        throw new Error('Macro arguments cannot be resolved.')
+      }
+
+      result = (exported as Function).apply(ctx, args)
+    } else {
+      result = exported
+    }
+
+    if (isAwait) {
+      result = await result
+    }
+
+    deps.get(id)!.add(resolved)
+    return result
   }
 
   function collectMacros() {
     const macros: Macro[] = []
     let scope = attachScopes(program, 'scope')
-    const parentStack: Node[] = []
+    const parentStack: t.Node[] = []
+    const skip = new Set<t.Node>()
 
-    walkAST<WithScope<Node>>(program, {
+    walkAST<WithScope<t.Node>>(program, {
       enter(node, parent) {
+        if (skip.has(node)) {
+          return this.skip()
+        }
+
         parent && parentStack.push(parent)
         if (node.scope) scope = node.scope
 
@@ -161,8 +197,7 @@ export async function transformMacros(
           node.type.startsWith('TS') &&
           !TS_NODE_TYPES.includes(node.type as any)
         ) {
-          this.skip()
-          return
+          return this.skip()
         }
 
         const isAwait = parent?.type === 'AwaitExpression'
@@ -180,6 +215,7 @@ export async function transformMacros(
           node.type === 'CallExpression' &&
           isTypeOf(node.callee, ['Identifier', 'MemberExpression'])
         ) {
+          skip.add(node.callee)
           let id: string[]
           try {
             id = resolveIdentifier(node.callee)
@@ -187,25 +223,14 @@ export async function transformMacros(
             return
           }
           if (!imports.has(id[0]) || scope.contains(id[0])) return
-          const args = node.arguments.map((arg) => {
-            if (isLiteralType(arg)) return resolveLiteral(arg)
-            try {
-              if (isTypeOf(arg, ['ObjectExpression', 'ArrayExpression']))
-                return new Function(
-                  `return (${source.slice(arg.start!, arg.end!)})`,
-                )()
-            } catch {}
-            throw new Error('Macro arguments cannot be resolved.')
-          })
 
           macros.push({
             type: 'call',
             node: isAwait ? parent : node,
             id,
-            args,
+            args: node.arguments,
             isAwait,
           })
-          this.skip()
         } else if (
           isTypeOf(node, ['Identifier', 'MemberExpression']) &&
           (!parent || isReferenced(node, parent, parentStack.at(-2)))
@@ -228,6 +253,10 @@ export async function transformMacros(
         }
       },
       leave(node) {
+        if (skip.has(node)) {
+          return this.skip()
+        }
+
         if (node.scope) scope = scope.parent!
         parentStack.pop()
       },
@@ -255,7 +284,7 @@ export async function transformMacros(
 
 function checkImportAttributes(
   expected: Record<string, string>,
-  actual: ImportAttribute[],
+  actual: t.ImportAttribute[],
 ) {
   const actualAttrs = Object.fromEntries(
     actual.map((attr) => [resolveObjectKey(attr), attr.value.value]),
