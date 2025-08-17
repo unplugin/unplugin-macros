@@ -15,7 +15,11 @@ import {
   type ImportBinding,
   type WithScope,
 } from 'ast-kit'
-import { generateTransform, MagicStringAST } from 'magic-string-ast'
+import {
+  generateTransform,
+  MagicStringAST,
+  type CodeTransform,
+} from 'magic-string-ast'
 import type { ImportAttribute, Node } from '@babel/types'
 import type { UnpluginBuildContext, UnpluginContext } from 'unplugin'
 import type { ViteNodeRunner } from 'vite-node/client'
@@ -38,47 +42,37 @@ export interface MacroContext {
   unpluginContext: UnpluginBuildContext & UnpluginContext
 }
 
-interface MacroBase {
+export interface MacroBase {
   node: Node
   id: string[]
   isAwait: boolean
 }
-interface CallMacro extends MacroBase {
+export interface CallMacro extends MacroBase {
   type: 'call'
   args: any[]
 }
-interface IdentifierMacro extends MacroBase {
+export interface IdentifierMacro extends MacroBase {
   type: 'identifier'
 }
-type Macro = CallMacro | IdentifierMacro
+export type Macro = CallMacro | IdentifierMacro
 
-/**
- * Transforms macros in the given source code.
- * @param param0 - The transformation options.
- * @param param0.source - The source code to transform.
- * @param param0.id - The filename of the source file.
- * @param param0.unpluginContext - The unplugin context.
- * @param param0.getRunner - A function to get the ViteNodeRunner instance.
- * @param param0.deps - The dependencies of the source file.
- * @param param0.attrs - The import attributes to match.
- * @returns The transformed code and source map, or undefined if no macros were found.
- */
-export async function transformMacros({
-  source,
-  id,
-  unpluginContext,
-  getRunner,
-  deps,
-  attrs,
-}: {
+export interface TransformOptions {
   id: string
   source: string
   unpluginContext: UnpluginBuildContext & UnpluginContext
-
-  getRunner: () => Promise<ViteNodeRunner>
   deps: Map<string, Set<string>>
   attrs: Record<string, string>
-}): Promise<{ code: string; map: any } | undefined> {
+  getRunner: () => Promise<ViteNodeRunner>
+}
+
+/**
+ * Transforms macros in the given source code.
+ */
+export async function transformMacros(
+  options: TransformOptions,
+): Promise<CodeTransform | undefined> {
+  const { source, id, unpluginContext, deps, attrs, getRunner } = options
+
   const program = babelParse(source, getLang(id))
   const s = new MagicStringAST(source)
 

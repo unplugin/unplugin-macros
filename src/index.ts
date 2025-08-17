@@ -8,10 +8,27 @@ import { ViteNodeRunner } from 'vite-node/client'
 import { ViteNodeServer } from 'vite-node/server'
 import { installSourcemapsSupport } from 'vite-node/source-map'
 import { transformMacros } from './core'
-import { resolveOptions, type Options } from './core/options'
+import {
+  resolveOptions,
+  type Options,
+  type OptionsResolved,
+} from './core/options'
 import type { ModuleNode, ViteDevServer } from 'vite'
 
 export type { MacroContext, Options } from './core'
+
+async function initServer(options: OptionsResolved) {
+  const { createServer } = await import('vite')
+  const server = await createServer({
+    ...options.viteConfig,
+    optimizeDeps: {
+      include: [],
+      noDiscovery: true,
+    },
+  })
+  await server.pluginContainer.buildStart({})
+  return server
+}
 
 /**
  * The main unplugin instance.
@@ -20,7 +37,8 @@ const plugin: UnpluginInstance<Options | undefined, false> = createUnplugin<
   Options | undefined,
   false
 >((rawOptions = {}) => {
-  const { include, exclude, ...options } = resolveOptions(rawOptions)
+  const options = resolveOptions(rawOptions)
+  const { include, exclude } = options
 
   let isBuiltinServer: boolean
   let server: ViteDevServer
@@ -34,22 +52,9 @@ const plugin: UnpluginInstance<Options | undefined, false> = createUnplugin<
     if (initPromise) return initPromise
     return (initPromise = (async () => {
       isBuiltinServer = !options.viteServer
-      server = options.viteServer || (await initServer())
+      server = options.viteServer || (await initServer(options))
       initRunner()
     })())
-  }
-
-  async function initServer() {
-    const { createServer } = await import('vite')
-    const server = await createServer({
-      ...options.viteConfig,
-      optimizeDeps: {
-        include: [],
-        noDiscovery: true,
-      },
-    })
-    await server.pluginContainer.buildStart({})
-    return server
   }
 
   function initRunner() {
@@ -82,9 +87,8 @@ const plugin: UnpluginInstance<Options | undefined, false> = createUnplugin<
     return runner!
   }
 
-  const name = 'unplugin-macros'
   return {
-    name,
+    name: 'unplugin-macros',
     enforce: options.enforce,
 
     buildEnd() {
