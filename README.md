@@ -1,6 +1,9 @@
-# unplugin-macros [![npm](https://img.shields.io/npm/v/unplugin-macros.svg)](https://npmjs.com/package/unplugin-macros) [![jsr](https://img.shields.io/endpoint?url=https%3A%2F%2Fjsr-api.sxzz.moe%2Fbadge%2F%40unplugin%2Fmacros)](https://jsr.io/@unplugin/macros)
+# unplugin-macros
 
-[![Unit Test](https://github.com/unplugin/unplugin-macros/actions/workflows/unit-test.yml/badge.svg)](https://github.com/unplugin/unplugin-macros/actions/workflows/unit-test.yml)
+[![npm version][npm-version-src]][npm-version-href]
+[![npm downloads][npm-downloads-src]][npm-downloads-href]
+[![JSR][jsr-src]][jsr-href]
+[![Unit Test][unit-test-src]][unit-test-href]
 
 > Macros are a mechanism for running JavaScript functions at bundle-time.
 > The value returned from these functions or variables are directly inlined into your bundle.
@@ -119,3 +122,14 @@ Thanks to [Bun Macros](https://bun.sh/blog/bun-macros).
 ## License
 
 [MIT](./LICENSE) License © 2023-PRESENT [三咲智子](https://github.com/sxzz)
+
+<!-- Badges -->
+
+[npm-version-src]: https://img.shields.io/npm/v/unplugin-macros.svg
+[npm-version-href]: https://npmjs.com/package/unplugin-macros
+[npm-downloads-src]: https://img.shields.io/npm/dm/unplugin-macros
+[npm-downloads-href]: https://www.npmcharts.com/compare/unplugin-macros?interval=30
+[jsr-src]: https://jsr.io/badges/@unplugin/macros
+[jsr-href]: https://jsr.io/@unplugin/macros
+[unit-test-src]: https://github.com/unplugin/unplugin-macros/actions/workflows/unit-test.yml/badge.svg
+[unit-test-href]: https://github.com/unplugin/unplugin-macros/actions/workflows/unit-test.yml
