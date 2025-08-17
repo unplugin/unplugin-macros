@@ -5,3 +5,7 @@ export function getStartupTime() {
 export function rand() {
   return Math.random()
 }
+
+export function echo(value: any) {
+  return value
+}
