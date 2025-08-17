@@ -53,7 +53,7 @@ exports[`fixture > tests/fixtures/import-namespace.js 1`] = `
 
 exports[`fixture > tests/fixtures/nested-macro.js 1`] = `
 "// nested-macro.js
-10 === 10;
+11 === 11;
 "
 `;
 

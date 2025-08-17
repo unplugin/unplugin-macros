@@ -11,6 +11,7 @@ import {
   resolveObjectKey,
   TS_NODE_TYPES,
   walkAST,
+  walkASTAsync,
   walkImportDeclaration,
   type ImportBinding,
   type WithScope,
@@ -90,8 +91,7 @@ export async function transformMacros(
       }
 
       const result = await executeMacro(macro, runner, id)
-      const text = result === undefined ? 'undefined' : JSON.stringify(result)
-      s.overwriteNode(macro.node, text)
+      s.overwriteNode(macro.node, stringifyValue(result))
     }
   } else {
     deps.delete(id)
@@ -146,20 +146,24 @@ export async function transformMacros(
           continue
         }
 
-        const macro = macros.find((macro) => macro.node === arg)
-        if (macro) {
-          skip.add(macro)
-          args.push(await executeMacro(macro, runner, id))
-          continue
-        }
+        const code = source.slice(arg.start!, arg.end!)
+        const s = new MagicStringAST(code, { offset: -arg.start! })
+
+        await walkASTAsync(arg, {
+          async enter(node) {
+            const subMacro = macros.find((macro) => macro.node === node)
+            if (subMacro) {
+              skip.add(subMacro)
+              const result = await executeMacro(subMacro, runner, id)
+              s.overwriteNode(node, stringifyValue(result))
+              this.skip()
+            }
+          },
+        })
 
         try {
-          if (isTypeOf(arg, ['ObjectExpression', 'ArrayExpression'])) {
-            args.push(
-              new Function(`return (${source.slice(arg.start!, arg.end!)})`)(),
-            )
-            continue
-          }
+          args.push(new Function(`return (${s.toString()})`)())
+          continue
         } catch {}
 
         throw new Error('Macro arguments cannot be resolved.')
@@ -292,4 +296,8 @@ function checkImportAttributes(
   return Object.entries(expected).every(
     ([key, expectedValue]) => actualAttrs[key] === expectedValue,
   )
+}
+
+function stringifyValue(value: unknown): string {
+  return value === undefined ? 'undefined' : JSON.stringify(value)
 }
