@@ -99,6 +99,97 @@ export async function transformMacros(
 
   return generateTransform(s, id)
 
+  function collectMacros() {
+    const macros: Macro[] = []
+    let scope = attachScopes(program, 'scope')
+    const parentStack: t.Node[] = []
+    const skip = new Set<t.Node>()
+
+    walkAST<WithScope<t.Node>>(program, {
+      enter(node, parent) {
+        if (skip.has(node)) {
+          return this.skip()
+        }
+
+        parent && parentStack.push(parent)
+        if (node.scope) scope = node.scope
+
+        if (
+          node.type.startsWith('TS') &&
+          !TS_NODE_TYPES.includes(node.type as any)
+        ) {
+          return this.skip()
+        }
+
+        const isAwait = parent?.type === 'AwaitExpression'
+
+        if (node.type === 'TaggedTemplateExpression') {
+          node = {
+            ...(node as any),
+            type: 'CallExpression',
+            callee: node.tag,
+            arguments: [node.quasi],
+          }
+        }
+
+        if (
+          node.type === 'CallExpression' &&
+          isTypeOf(node.callee, ['Identifier', 'MemberExpression'])
+        ) {
+          skip.add(node.callee)
+          let id: string[]
+          try {
+            id = resolveIdentifier(node.callee)
+          } catch {
+            return
+          }
+          if (!imports.has(id[0]) || scope.contains(id[0])) return
+
+          macros.push({
+            type: 'call',
+            node: isAwait ? parent : node,
+            id,
+            args: node.arguments,
+            isAwait,
+          })
+        } else if (
+          isTypeOf(node, ['Identifier', 'MemberExpression']) &&
+          (!parent || isReferenced(node, parent, parentStack.at(-2)))
+        ) {
+          if (parent?.type === 'ExportSpecifier') {
+            throw new Error('Exporting macros is not allowed.')
+          }
+
+          let id: string[]
+          try {
+            id = resolveIdentifier(node)
+          } catch {
+            return
+          }
+          if (!imports.has(id[0]) || scope.contains(id[0])) return
+
+          macros.push({
+            type: 'identifier',
+            node: isAwait ? parent : node,
+            id,
+            isAwait,
+          })
+          this.skip()
+        }
+      },
+      leave(node) {
+        if (skip.has(node)) {
+          return this.skip()
+        }
+
+        if (node.scope) scope = scope.parent!
+        parentStack.pop()
+      },
+    })
+
+    return macros
+  }
+
   async function executeMacro(
     macro: Macro,
     runner: ViteNodeRunner,
@@ -180,93 +271,6 @@ export async function transformMacros(
 
     deps.get(id)!.add(resolved)
     return result
-  }
-
-  function collectMacros() {
-    const macros: Macro[] = []
-    let scope = attachScopes(program, 'scope')
-    const parentStack: t.Node[] = []
-    const skip = new Set<t.Node>()
-
-    walkAST<WithScope<t.Node>>(program, {
-      enter(node, parent) {
-        if (skip.has(node)) {
-          return this.skip()
-        }
-
-        parent && parentStack.push(parent)
-        if (node.scope) scope = node.scope
-
-        if (
-          node.type.startsWith('TS') &&
-          !TS_NODE_TYPES.includes(node.type as any)
-        ) {
-          return this.skip()
-        }
-
-        const isAwait = parent?.type === 'AwaitExpression'
-
-        if (node.type === 'TaggedTemplateExpression') {
-          node = {
-            ...(node as any),
-            type: 'CallExpression',
-            callee: node.tag,
-            arguments: [node.quasi],
-          }
-        }
-
-        if (
-          node.type === 'CallExpression' &&
-          isTypeOf(node.callee, ['Identifier', 'MemberExpression'])
-        ) {
-          skip.add(node.callee)
-          let id: string[]
-          try {
-            id = resolveIdentifier(node.callee)
-          } catch {
-            return
-          }
-          if (!imports.has(id[0]) || scope.contains(id[0])) return
-
-          macros.push({
-            type: 'call',
-            node: isAwait ? parent : node,
-            id,
-            args: node.arguments,
-            isAwait,
-          })
-        } else if (
-          isTypeOf(node, ['Identifier', 'MemberExpression']) &&
-          (!parent || isReferenced(node, parent, parentStack.at(-2)))
-        ) {
-          let id: string[]
-          try {
-            id = resolveIdentifier(node)
-          } catch {
-            return
-          }
-          if (!imports.has(id[0]) || scope.contains(id[0])) return
-
-          macros.push({
-            type: 'identifier',
-            node: isAwait ? parent : node,
-            id,
-            isAwait,
-          })
-          this.skip()
-        }
-      },
-      leave(node) {
-        if (skip.has(node)) {
-          return this.skip()
-        }
-
-        if (node.scope) scope = scope.parent!
-        parentStack.pop()
-      },
-    })
-
-    return macros
   }
 
   function recordImports() {
