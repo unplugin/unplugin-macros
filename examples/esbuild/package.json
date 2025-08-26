@@ -8,6 +8,6 @@
   },
   "devDependencies": {
     "esbuild": "^0.25.9",
-    "tsx": "^4.20.4"
+    "tsx": "^4.20.5"
   }
 }
