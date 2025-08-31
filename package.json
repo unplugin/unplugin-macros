@@ -31,13 +31,13 @@
   "exports": {
     ".": "./dist/index.js",
     "./api": "./dist/api.js",
+    "./esbuild": "./dist/esbuild.js",
+    "./rolldown": "./dist/rolldown.js",
+    "./rollup": "./dist/rollup.js",
+    "./rspack": "./dist/rspack.js",
     "./vite": "./dist/vite.js",
     "./webpack": "./dist/webpack.js",
-    "./rspack": "./dist/rspack.js",
-    "./rollup": "./dist/rollup.js",
-    "./rolldown": "./dist/rolldown.js",
-    "./esbuild": "./dist/esbuild.js",
-    "./*": "./*"
+    "./package.json": "./package.json"
   },
   "typesVersions": {
     "*": {
@@ -64,7 +64,7 @@
   "dependencies": {
     "ast-kit": "^2.1.2",
     "magic-string-ast": "^1.0.2",
-    "unplugin": "^2.3.8",
+    "unplugin": "^2.3.9",
     "vite": "^7.1.3",
     "vite-node": "^3.2.4"
   },
@@ -81,7 +81,7 @@
     "eslint": "^9.34.0",
     "fast-glob": "^3.3.3",
     "prettier": "^3.6.2",
-    "rollup": "^4.48.1",
+    "rollup": "^4.50.0",
     "tsdown": "^0.14.2",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4",

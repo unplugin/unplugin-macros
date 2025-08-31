@@ -13,7 +13,7 @@ export interface Options {
 
   /**
    * The patterns of files to exclude.
-   * @default [/node_modules/]
+   * @default [/node_modules/, /\.d\.[cm]?ts$/]
    */
   exclude?: FilterPattern
 
@@ -65,7 +65,7 @@ export type OptionsResolved = Omit<
 export function resolveOptions(options: Options): OptionsResolved {
   return {
     include: options.include || [/\.[cm]?[jt]sx?$/],
-    exclude: options.exclude || [/node_modules/],
+    exclude: options.exclude || [/node_modules/, /\.d\.[cm]?ts$/],
     viteServer: options.viteServer,
     viteConfig: options.viteConfig || {},
     enforce: 'enforce' in options ? options.enforce : 'pre',
