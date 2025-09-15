@@ -156,10 +156,6 @@ export async function transformMacros(
           isTypeOf(node, ['Identifier', 'MemberExpression']) &&
           (!parent || isReferenced(node, parent, parentStack.at(-2)))
         ) {
-          if (parent?.type === 'ExportSpecifier') {
-            throw new Error('Exporting macros is not allowed.')
-          }
-
           let id: string[]
           try {
             id = resolveIdentifier(node)
@@ -167,6 +163,9 @@ export async function transformMacros(
             return
           }
           if (!imports.has(id[0]) || scope.contains(id[0])) return
+          if (parent?.type === 'ExportSpecifier') {
+            throw new Error('Exporting macros is not allowed.')
+          }
 
           macros.push({
             type: 'identifier',
