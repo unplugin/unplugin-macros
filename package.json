@@ -1,7 +1,7 @@
 {
   "name": "unplugin-macros",
   "version": "0.18.2",
-  "packageManager": "pnpm@10.18.1",
+  "packageManager": "pnpm@10.18.2",
   "description": "Macros for bundlers.",
   "type": "module",
   "keywords": [
@@ -75,7 +75,7 @@
     "@sxzz/prettier-config": "^2.2.4",
     "@sxzz/test-utils": "^0.5.11",
     "@types/dedent": "^0.7.2",
-    "@types/node": "^24.7.0",
+    "@types/node": "^24.7.2",
     "bumpp": "^10.3.1",
     "dedent": "^1.7.0",
     "eslint": "^9.37.0",
