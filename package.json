@@ -1,7 +1,7 @@
 {
   "name": "unplugin-macros",
   "version": "0.18.2",
-  "packageManager": "pnpm@10.20.0",
+  "packageManager": "pnpm@10.21.0",
   "description": "Macros for bundlers.",
   "type": "module",
   "keywords": [
@@ -62,10 +62,10 @@
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
-    "ast-kit": "^2.1.3",
+    "ast-kit": "^2.2.0",
     "magic-string-ast": "^1.0.3",
     "unplugin": "^2.3.10",
-    "vite": "^7.1.12",
+    "vite": "^7.2.2",
     "vite-node": "^3.2.4"
   },
   "devDependencies": {
@@ -78,14 +78,14 @@
     "@types/node": "^24.10.0",
     "bumpp": "^10.3.1",
     "dedent": "^1.7.0",
-    "eslint": "^9.39.0",
+    "eslint": "^9.39.1",
     "fast-glob": "^3.3.3",
     "prettier": "^3.6.2",
-    "rollup": "^4.52.5",
-    "tsdown": "^0.15.12",
+    "rollup": "^4.53.1",
+    "tsdown": "^0.16.1",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.6",
-    "vue": "^3.5.22"
+    "vitest": "^4.0.8",
+    "vue": "^3.5.24"
   },
   "engines": {
     "node": ">=20.18.0"
