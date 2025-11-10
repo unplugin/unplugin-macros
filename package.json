@@ -66,7 +66,7 @@
     "magic-string-ast": "^1.0.3",
     "unplugin": "^2.3.10",
     "vite": "^7.2.2",
-    "vite-node": "^3.2.4"
+    "vite-node": "^5.0.0"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.28.5",
