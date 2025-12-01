@@ -1,7 +1,7 @@
 {
   "name": "unplugin-macros",
   "version": "0.18.3",
-  "packageManager": "pnpm@10.23.0",
+  "packageManager": "pnpm@10.24.0",
   "description": "Macros for bundlers.",
   "type": "module",
   "keywords": [
@@ -65,27 +65,27 @@
     "ast-kit": "^2.2.0",
     "magic-string-ast": "^1.0.3",
     "unplugin": "^2.3.11",
-    "vite": "^7.2.4",
+    "vite": "^7.2.6",
     "vite-node": "^5.2.0"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.28.5",
     "@babel/types": "^7.28.5",
-    "@sxzz/eslint-config": "^7.3.2",
-    "@sxzz/prettier-config": "^2.2.5",
+    "@sxzz/eslint-config": "^7.4.0",
+    "@sxzz/prettier-config": "^2.2.6",
     "@sxzz/test-utils": "^0.5.13",
     "@types/dedent": "^0.7.2",
     "@types/node": "^24.10.1",
-    "bumpp": "^10.3.1",
+    "bumpp": "^10.3.2",
     "dedent": "^1.7.0",
     "eslint": "^9.39.1",
     "fast-glob": "^3.3.3",
-    "prettier": "^3.6.2",
+    "prettier": "^3.7.3",
     "rollup": "^4.53.3",
-    "tsdown": "^0.16.6",
+    "tsdown": "^0.16.8",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.13",
-    "vue": "^3.5.24"
+    "vitest": "^4.0.14",
+    "vue": "^3.5.25"
   },
   "engines": {
     "node": ">=20.18.0"
