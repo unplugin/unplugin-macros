@@ -1,6 +1,6 @@
 {
-  "version": "1.0.0",
   "type": "module",
+  "version": "1.0.0",
   "scripts": {
     "build": "tsx build.ts",
     "watch": "tsx watch build.ts",
@@ -8,6 +8,6 @@
   },
   "devDependencies": {
     "esbuild": "^0.27.0",
-    "tsx": "^4.20.6"
+    "tsx": "^4.21.0"
   }
 }

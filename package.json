@@ -1,9 +1,20 @@
 {
   "name": "unplugin-macros",
+  "type": "module",
   "version": "0.18.3",
   "packageManager": "pnpm@10.24.0",
   "description": "Macros for bundlers.",
-  "type": "module",
+  "author": "Kevin Deng <sxzz@sxzz.moe>",
+  "license": "MIT",
+  "funding": "https://github.com/sponsors/sxzz",
+  "homepage": "https://github.com/unplugin/unplugin-macros#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/unplugin/unplugin-macros.git"
+  },
+  "bugs": {
+    "url": "https://github.com/unplugin/unplugin-macros/issues"
+  },
   "keywords": [
     "unplugin",
     "rollup",
@@ -11,44 +22,36 @@
     "esbuild",
     "webpack"
   ],
-  "license": "MIT",
-  "homepage": "https://github.com/unplugin/unplugin-macros#readme",
-  "bugs": {
-    "url": "https://github.com/unplugin/unplugin-macros/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/unplugin/unplugin-macros.git"
-  },
-  "author": "Kevin Deng <sxzz@sxzz.moe>",
-  "funding": "https://github.com/sponsors/sxzz",
-  "files": [
-    "dist"
-  ],
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./dist/index.js",
-    "./api": "./dist/api.js",
-    "./esbuild": "./dist/esbuild.js",
-    "./rolldown": "./dist/rolldown.js",
-    "./rollup": "./dist/rollup.js",
-    "./rspack": "./dist/rspack.js",
-    "./vite": "./dist/vite.js",
-    "./webpack": "./dist/webpack.js",
+    ".": "./dist/index.mjs",
+    "./api": "./dist/api.mjs",
+    "./esbuild": "./dist/esbuild.mjs",
+    "./rolldown": "./dist/rolldown.mjs",
+    "./rollup": "./dist/rollup.mjs",
+    "./rspack": "./dist/rspack.mjs",
+    "./vite": "./dist/vite.mjs",
+    "./webpack": "./dist/webpack.mjs",
     "./package.json": "./package.json"
   },
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "typesVersions": {
     "*": {
       "*": [
-        "./dist/*",
+        "./dist/*.d.mts",
         "./*"
       ]
     }
   },
+  "files": [
+    "dist"
+  ],
   "publishConfig": {
     "access": "public"
+  },
+  "engines": {
+    "node": ">=20.19.0"
   },
   "scripts": {
     "lint": "eslint .",
@@ -71,7 +74,7 @@
   "devDependencies": {
     "@babel/eslint-parser": "^7.28.5",
     "@babel/types": "^7.28.5",
-    "@sxzz/eslint-config": "^7.4.0",
+    "@sxzz/eslint-config": "^7.4.1",
     "@sxzz/prettier-config": "^2.2.6",
     "@sxzz/test-utils": "^0.5.13",
     "@types/dedent": "^0.7.2",
@@ -80,15 +83,12 @@
     "dedent": "^1.7.0",
     "eslint": "^9.39.1",
     "fast-glob": "^3.3.3",
-    "prettier": "^3.7.3",
+    "prettier": "^3.7.4",
     "rollup": "^4.53.3",
-    "tsdown": "^0.16.8",
+    "tsdown": "^0.17.0-beta.6",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.14",
+    "vitest": "^4.0.15",
     "vue": "^3.5.25"
-  },
-  "engines": {
-    "node": ">=20.18.0"
   },
   "prettier": "@sxzz/prettier-config"
 }

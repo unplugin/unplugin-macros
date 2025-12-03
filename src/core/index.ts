@@ -25,8 +25,8 @@ import type * as t from '@babel/types'
 import type { UnpluginBuildContext, UnpluginContext } from 'unplugin'
 import type { ViteNodeRunner } from 'vite-node/client'
 
-export * from './options'
 export * from './define'
+export * from './options'
 
 /**
  * Represents the context object passed to macros.
