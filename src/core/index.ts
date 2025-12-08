@@ -1,4 +1,4 @@
-import { builtinModules } from 'node:module'
+import { isBuiltin } from 'node:module'
 import {
   attachScopes,
   babelParse,
@@ -202,7 +202,7 @@ export async function transformMacros(
     const [, resolved] = await runner.resolveUrl(binding.source, id)
 
     let exported
-    if (resolved.startsWith('node:') || builtinModules.includes(resolved)) {
+    if (isBuiltin(resolved)) {
       exported = await import(resolved)
     } else {
       const module = await runner.executeFile(resolved)
