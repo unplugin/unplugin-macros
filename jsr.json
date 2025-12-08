@@ -1,6 +1,6 @@
 {
   "name": "@unplugin/macros",
-  "version": "0.18.3",
+  "version": "0.18.4",
   "exports": {
     "./index": "./src/index.ts",
     "./api": "./src/api.ts",
