@@ -2,7 +2,7 @@
   "name": "unplugin-macros",
   "type": "module",
   "version": "0.18.3",
-  "packageManager": "pnpm@10.24.0",
+  "packageManager": "pnpm@10.25.0",
   "description": "Macros for bundlers.",
   "author": "Kevin Deng <sxzz@sxzz.moe>",
   "license": "MIT",
