@@ -7,8 +7,10 @@ exports[`fixture > tests/fixtures/args.js 1`] = `
 false === false;
 null === null;
 undefined === undefined;
-console.log({"a":"b"});
-console.log([1,false,"hello"]);
+console.log(
+  { "a": "b", "date": new Date(0), "regexp": /abc/g },
+);
+console.log([1, false, "hello", undefined, null, 2n]);
 "
 `;
 
@@ -27,7 +29,7 @@ const { bar = 1 } = {};
 exports[`fixture > tests/fixtures/css.js 1`] = `
 "// css.js
 // prettier-ignore
-const style = {"color":"red"};
+const style = { "color": "red" };
 "
 `;
 

@@ -302,5 +302,30 @@ function checkImportAttributes(
 }
 
 function stringifyValue(value: unknown): string {
-  return value === undefined ? 'undefined' : JSON.stringify(value)
+  if (typeof value === 'bigint') {
+    return `${value}n`
+  }
+  if (typeof value === 'function' || typeof value === 'symbol') {
+    throw new SyntaxError(`Cannot stringify value of type ${typeof value}`)
+  }
+  if (Array.isArray(value)) {
+    return `[${value.map(stringifyValue).join(', ')}]`
+  }
+  const type = Object.prototype.toString.call(value)
+  if (type === '[object Promise]') {
+    throw new SyntaxError(`Cannot stringify a Promise value`)
+  }
+  if (value == null || type === '[object RegExp]') {
+    return String(value)
+  }
+  if (typeof value === 'object' && type === '[object Object]') {
+    const entries = Object.entries(value).map(
+      ([k, v]) => `${JSON.stringify(k)}: ${stringifyValue(v)}`,
+    )
+    return `{ ${entries.join(', ')} }`
+  }
+  if (type === '[object Date]') {
+    return `new Date(${(value as Date).getTime()})`
+  }
+  return JSON.stringify(value)
 }
