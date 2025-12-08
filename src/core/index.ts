@@ -210,13 +210,14 @@ export async function transformMacros(
     }
 
     const props = [...keys]
-    if (binding.imported !== '*') props.unshift(binding.imported)
+    if (binding.imported !== '*') {
+      if (!(binding.imported in exported)) {
+        throw new Error(`Macro ${local} is not existed.`)
+      }
+      props.unshift(binding.imported)
+    }
     for (const key of props) {
       exported = exported?.[key]
-    }
-
-    if (!exported) {
-      throw new Error(`Macro ${local} is not existed.`)
     }
 
     let result: any
