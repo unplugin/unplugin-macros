@@ -68,7 +68,7 @@
     "ast-kit": "^2.2.0",
     "magic-string-ast": "^1.0.3",
     "unplugin": "^2.3.11",
-    "vite": "^7.2.6",
+    "vite": "^7.2.7",
     "vite-node": "^5.2.0"
   },
   "devDependencies": {
@@ -85,7 +85,7 @@
     "fast-glob": "^3.3.3",
     "prettier": "^3.7.4",
     "rollup": "^4.53.3",
-    "tsdown": "^0.17.0-beta.6",
+    "tsdown": "^0.17.1",
     "typescript": "^5.9.3",
     "vitest": "^4.0.15",
     "vue": "^3.5.25"
