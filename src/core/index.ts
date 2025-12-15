@@ -16,12 +16,9 @@ import {
   type ImportBinding,
   type WithScope,
 } from 'ast-kit'
-import {
-  generateTransform,
-  MagicStringAST,
-  type CodeTransform,
-} from 'magic-string-ast'
+import { MagicStringAST } from 'magic-string-ast'
 import type * as t from '@babel/types'
+import type { RolldownString } from 'rolldown-string'
 import type { UnpluginBuildContext, UnpluginContext } from 'unplugin'
 import type { ViteNodeRunner } from 'vite-node/client'
 
@@ -59,7 +56,7 @@ export type Macro = CallMacro | IdentifierMacro
 
 export interface TransformOptions {
   id: string
-  source: string
+  s: RolldownString
   unpluginContext: UnpluginBuildContext & UnpluginContext
   deps: Map<string, Set<string>>
   attrs: Record<string, string>
@@ -71,11 +68,12 @@ export interface TransformOptions {
  */
 export async function transformMacros(
   options: TransformOptions,
-): Promise<CodeTransform | undefined> {
-  const { source, id, unpluginContext, deps, attrs, getRunner } = options
+): Promise<void> {
+  const { id, unpluginContext, deps, attrs, getRunner } = options
 
+  const source = options.s.toString()
   const program = babelParse(source, getLang(id))
-  const s = new MagicStringAST(source)
+  const s = new MagicStringAST(options.s as any)
 
   const imports = new Map(Object.entries(recordImports()))
   const macros = collectMacros()
@@ -96,8 +94,6 @@ export async function transformMacros(
   } else {
     deps.delete(id)
   }
-
-  return generateTransform(s, id)
 
   function collectMacros() {
     const macros: Macro[] = []

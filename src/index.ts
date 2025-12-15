@@ -3,6 +3,7 @@
  * @module
  */
 
+import { withMagicString } from 'rolldown-string'
 import { createUnplugin, type UnpluginInstance } from 'unplugin'
 import { ViteNodeRunner } from 'vite-node/client'
 import { ViteNodeServer } from 'vite-node/server'
@@ -100,16 +101,16 @@ const plugin: UnpluginInstance<Options | undefined, false> = createUnplugin<
 
     transform: {
       filter: { id: { include, exclude } },
-      handler(source, id) {
+      handler: withMagicString(function (s, id) {
         return transformMacros({
-          source,
+          s,
           id,
           getRunner,
           deps,
           attrs: options.attrs,
           unpluginContext: this,
         })
-      },
+      }),
     },
 
     vite: {

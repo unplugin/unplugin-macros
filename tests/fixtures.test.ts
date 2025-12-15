@@ -1,4 +1,3 @@
-import { resolve } from 'node:path'
 import { rollupBuild, testFixtures } from '@sxzz/test-utils'
 import { describe, vi } from 'vitest'
 import Macros from '../src/rollup'
@@ -7,7 +6,7 @@ vi.spyOn(Math, 'random').mockReturnValue(0.5)
 
 describe('fixture', async () => {
   await testFixtures(
-    'tests/fixtures/*.{js,ts}',
+    'fixtures/*.{js,ts}',
     async (args, id) =>
       (
         await rollupBuild(id, [
@@ -21,7 +20,7 @@ describe('fixture', async () => {
         ])
       ).snapshot,
     {
-      cwd: resolve(__dirname, '..'),
+      cwd: import.meta.dirname,
       promise: true,
     },
   )
