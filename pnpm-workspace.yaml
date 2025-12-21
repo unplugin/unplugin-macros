@@ -1,6 +1,5 @@
 packages:
   - examples/*
 
-ignoredBuiltDependencies:
-  - esbuild
-  - unrs-resolver
+allowBuilds:
+  esbuild: false
