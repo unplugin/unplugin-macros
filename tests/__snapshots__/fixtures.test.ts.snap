@@ -115,16 +115,16 @@ exports[`fixture > fixtures/shorthand-property.js 1`] = `
 "// shorthand-property.js
 const mixed = {
   ...{ existing: true },
-  "foo": 1,
+  foo: 1,
   regular: 'value',
-  "bar": "bar-value",
-  "baz": { "nested": true },
+  bar: "bar-value",
+  baz: { "nested": true },
   another: 123,
   outer: {
-    "foo": 1,
-    "bar": "bar-value",
+    foo: 1,
+    bar: "bar-value",
   },
-  "_undefined": undefined,
+  _undefined: undefined,
 };
 "
 `;

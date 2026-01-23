@@ -44,7 +44,7 @@ export interface MacroBase {
   node: t.Node
   id: string[]
   isAwait: boolean
-  parent?: t.Node
+  parent?: t.Node | null
 }
 export interface CallMacro extends MacroBase {
   type: 'call'
@@ -93,18 +93,14 @@ export async function transformMacros(
       const stringified = stringifyValue(result)
 
       // Handle shorthand property in object literals: { foo } -> { foo: value }
-      const parent = macro.parent
+      const { parent } = macro
       if (
         parent?.type === 'ObjectProperty' &&
-        (parent as t.ObjectProperty).shorthand &&
-        macro.type === 'identifier'
+        parent.shorthand &&
+        macro.type === 'identifier' &&
+        parent.key.type === 'Identifier'
       ) {
-        const prop = parent as t.ObjectProperty
-        const keyName =
-          prop.key.type === 'Identifier'
-            ? prop.key.name
-            : source.slice(prop.key.start!, prop.key.end!)
-        s.overwriteNode(prop, `${JSON.stringify(keyName)}: ${stringified}`)
+        s.overwriteNode(macro.node, `${parent.key.name}: ${stringified}`)
       } else {
         s.overwriteNode(macro.node, stringified)
       }
@@ -165,7 +161,7 @@ export async function transformMacros(
             id,
             args: node.arguments,
             isAwait,
-            parent: parent ?? undefined,
+            parent,
           })
         } else if (
           isTypeOf(node, ['Identifier', 'MemberExpression']) &&
@@ -187,7 +183,7 @@ export async function transformMacros(
             node: isAwait ? parent : node,
             id,
             isAwait,
-            parent: parent ?? undefined,
+            parent,
           })
           this.skip()
         }
