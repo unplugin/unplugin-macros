@@ -52,6 +52,8 @@ exports[`fixture > fixtures/error-not-existed-macro.js 1`] = `[Error: Macro what
 
 exports[`fixture > fixtures/error-re-export.js 1`] = `[Error: Exporting macros is not allowed.]`;
 
+exports[`fixture > fixtures/error-re-export-not-existed.js 1`] = `[Error: Macro whatever is not existed.]`;
+
 exports[`fixture > fixtures/import-namespace.js 1`] = `
 "// import-namespace.js
 0.5 === 0.5;
@@ -108,6 +110,23 @@ exports[`fixture > fixtures/promise.js 1`] = `
 "// promise.js
 const a = "ok";
 const b = "ok";
+"
+`;
+
+exports[`fixture > fixtures/re-export.js 1`] = `
+"// re-export.js
+const __macro_export_0 = 'keep';
+
+const __macro_export_1 = 1;
+const __macro_export_2 = "bar-value";
+const __macro_export_3 = undefined;
+
+const __macro_export_4 = "default-value";
+const __macro_export_5 = 1;
+const __macro_export_6 = "omega-value";
+const __macro_export_7 = { "default": "default-value", "alpha": 1, "omega": "omega-value" };
+
+export { __macro_export_5 as alpha, __macro_export_4 as defaultValue, __macro_export_7 as exportedValues, __macro_export_2 as namedBar, __macro_export_1 as namedFoo, __macro_export_3 as namedUndefined, __macro_export_6 as omega };
 "
 `;
 
