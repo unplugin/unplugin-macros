@@ -54,6 +54,10 @@ export interface IdentifierMacro extends MacroBase {
   type: 'identifier'
 }
 export type Macro = CallMacro | IdentifierMacro
+type MacroExportDeclaration = (
+  | t.ExportNamedDeclaration
+  | t.ExportAllDeclaration
+) & { source: t.StringLiteral }
 
 export interface TransformOptions {
   id: string
@@ -75,14 +79,21 @@ export async function transformMacros(
   const source = options.s.toString()
   const program = babelParse(source, getLang(id))
   const s = new MagicStringAST(options.s as any)
+  let generatedExportIndex = 0
 
   const imports = new Map(Object.entries(recordImports()))
+  const macroExports = program.body.filter(isMacroExportDeclaration)
   const macros = collectMacros()
   const skip = new Set<Macro>()
 
-  if (macros.length > 0) {
+  if (macros.length > 0 || macroExports.length > 0) {
     const runner = await getRunner()
     deps.set(id, new Set())
+
+    for (const declaration of macroExports) {
+      const transformed = await executeMacroExport(declaration, runner, id)
+      s.overwriteNode(declaration, transformed)
+    }
 
     for (const macro of macros) {
       if (skip.has(macro)) {
@@ -201,6 +212,95 @@ export async function transformMacros(
     return macros
   }
 
+  function isMacroExportDeclaration(
+    node: t.Node | undefined,
+  ): node is MacroExportDeclaration {
+    if (
+      !node ||
+      (node.type !== 'ExportNamedDeclaration' &&
+        node.type !== 'ExportAllDeclaration')
+    ) {
+      return false
+    }
+    return (
+      node.exportKind !== 'type' &&
+      !!node.source &&
+      !!node.attributes &&
+      checkImportAttributes(attrs, node.attributes)
+    )
+  }
+
+  async function executeMacroExport(
+    declaration: MacroExportDeclaration,
+    runner: ViteNodeRunner,
+    id: string,
+  ): Promise<string> {
+    const exported = await resolveMacroModule(
+      declaration.source.value,
+      runner,
+      id,
+    )
+    const out: string[] = []
+
+    const exportValue = (nameToken: string, value: unknown) => {
+      const localName = nextGeneratedExportLocal()
+      out.push(
+        `const ${localName} = ${stringifyValue(value)}`,
+        `export { ${localName} as ${nameToken} }`,
+      )
+    }
+
+    if (declaration.type === 'ExportNamedDeclaration') {
+      for (const specifier of declaration.specifiers) {
+        if (specifier.type === 'ExportNamespaceSpecifier') {
+          const exportName = source.slice(
+            specifier.exported.start!,
+            specifier.exported.end!,
+          )
+          exportValue(
+            exportName,
+            Object.fromEntries(
+              Object.entries(exported).filter(
+                ([name]) => name !== '__esModule',
+              ),
+            ),
+          )
+          continue
+        }
+
+        if (specifier.type !== 'ExportSpecifier') continue
+
+        const sourceLocal = specifier.local as t.Identifier | t.StringLiteral
+        const sourceName =
+          sourceLocal.type === 'StringLiteral'
+            ? sourceLocal.value
+            : sourceLocal.name
+        if (!(sourceName in exported)) {
+          throw new Error(`Macro ${sourceName} is not existed.`)
+        }
+
+        const exportName = source.slice(
+          specifier.exported.start!,
+          specifier.exported.end!,
+        )
+        exportValue(exportName, exported[sourceName])
+      }
+    } else {
+      const names = Object.keys(exported).filter(
+        (name) => name !== 'default' && name !== '__esModule',
+      )
+
+      for (const name of names) {
+        const exportName = /^[A-Za-z_$][\w$]*$/u.test(name)
+          ? name
+          : JSON.stringify(name)
+        exportValue(exportName, exported[name])
+      }
+    }
+
+    return out.length > 0 ? `${out.join(';\n')};` : ''
+  }
+
   async function executeMacro(
     macro: Macro,
     runner: ViteNodeRunner,
@@ -211,15 +311,7 @@ export async function transformMacros(
       isAwait,
     } = macro
     const binding = imports.get(local)!
-    const [, resolved] = await runner.resolveUrl(binding.source, id)
-
-    let exported
-    if (isBuiltin(resolved)) {
-      exported = await import(resolved)
-    } else {
-      const module = await runner.executeFile(resolved)
-      exported = module
-    }
+    let exported: any = await resolveMacroModule(binding.source, runner, id)
 
     const props = [...keys]
     if (binding.imported !== '*') {
@@ -281,8 +373,29 @@ export async function transformMacros(
       result = await result
     }
 
-    deps.get(id)!.add(resolved)
     return result
+  }
+
+  async function resolveMacroModule(
+    source: string,
+    runner: ViteNodeRunner,
+    id: string,
+  ): Promise<Record<string, unknown>> {
+    const [, resolved] = await runner.resolveUrl(source, id)
+    deps.get(id)!.add(resolved)
+
+    const module = isBuiltin(resolved)
+      ? await import(resolved)
+      : await runner.executeFile(resolved)
+    return module as Record<string, unknown>
+  }
+
+  function nextGeneratedExportLocal() {
+    while (true) {
+      const local = `__macro_export_${generatedExportIndex++}`
+      if (source.includes(local)) continue
+      return local
+    }
   }
 
   function recordImports() {
