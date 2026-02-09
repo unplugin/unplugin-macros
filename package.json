@@ -80,7 +80,7 @@
     "@typescript/native-preview": "7.0.0-dev.20260208.1",
     "bumpp": "^10.4.1",
     "dedent": "^1.7.1",
-    "eslint": "^9.39.2",
+    "eslint": "^10.0.0",
     "fast-glob": "^3.3.3",
     "prettier": "^3.8.1",
     "rollup": "^4.57.1",
