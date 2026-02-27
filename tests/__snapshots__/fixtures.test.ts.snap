@@ -52,6 +52,22 @@ exports[`fixture > fixtures/error-not-existed-macro.js 1`] = `[Error: Macro what
 
 exports[`fixture > fixtures/error-re-export.js 1`] = `[Error: Exporting macros is not allowed.]`;
 
+exports[`fixture > fixtures/fn.js 1`] = `
+"// fn.js
+function $macros$wrap(value) { return value }
+
+
+$macros$wrap(() => 42);
+$macros$wrap(async () => await 42);
+$macros$wrap(function () {
+  return 42
+});
+$macros$wrap(async function () {
+  return await 42
+});
+"
+`;
+
 exports[`fixture > fixtures/import-namespace.js 1`] = `
 "// import-namespace.js
 0.5 === 0.5;

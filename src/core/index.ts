@@ -74,7 +74,7 @@ export async function transformMacros(
 
   const source = options.s.toString()
   const program = babelParse(source, getLang(id))
-  const s = new MagicStringAST(options.s as any)
+  const s = new MagicStringAST(options.s)
 
   const imports = new Map(Object.entries(recordImports()))
   const macros = collectMacros()
@@ -87,6 +87,7 @@ export async function transformMacros(
 
   const runner = await getRunner()
   deps.set(id, new Set())
+  let needEcho = false
 
   for (const macro of macros) {
     if (skip.has(macro)) {
@@ -108,6 +109,10 @@ export async function transformMacros(
     } else {
       s.overwriteNode(macro.node, stringified)
     }
+  }
+
+  if (needEcho) {
+    s.prepend(`function $macros$wrap(value) { return value }\n`)
   }
 
   function collectMacros() {
@@ -301,6 +306,40 @@ export async function transformMacros(
     }
     return imports
   }
+
+  function stringifyValue(value: unknown): string {
+    const ty = typeof value
+    if (ty === 'bigint') {
+      return `${value}n`
+    }
+    if (ty === 'function') {
+      needEcho = true
+      return `$macros$wrap(${(value as Function).toString()})`
+    }
+    if (ty === 'symbol') {
+      throw new SyntaxError(`Cannot stringify value of type ${ty}`)
+    }
+    if (Array.isArray(value)) {
+      return `[${value.map(stringifyValue).join(', ')}]`
+    }
+    const type = Object.prototype.toString.call(value)
+    if (type === '[object Promise]') {
+      throw new SyntaxError(`Cannot stringify a Promise value`)
+    }
+    if (value == null || type === '[object RegExp]') {
+      return String(value)
+    }
+    if (ty === 'object' && type === '[object Object]') {
+      const entries = Object.entries(value).map(
+        ([k, v]) => `${JSON.stringify(k)}: ${stringifyValue(v)}`,
+      )
+      return `{ ${entries.join(', ')} }`
+    }
+    if (type === '[object Date]') {
+      return `new Date(${(value as Date).getTime()})`
+    }
+    return JSON.stringify(value)
+  }
 }
 
 function checkImportAttributes(
@@ -313,33 +352,4 @@ function checkImportAttributes(
   return Object.entries(expected).every(
     ([key, expectedValue]) => actualAttrs[key] === expectedValue,
   )
-}
-
-function stringifyValue(value: unknown): string {
-  if (typeof value === 'bigint') {
-    return `${value}n`
-  }
-  if (typeof value === 'function' || typeof value === 'symbol') {
-    throw new SyntaxError(`Cannot stringify value of type ${typeof value}`)
-  }
-  if (Array.isArray(value)) {
-    return `[${value.map(stringifyValue).join(', ')}]`
-  }
-  const type = Object.prototype.toString.call(value)
-  if (type === '[object Promise]') {
-    throw new SyntaxError(`Cannot stringify a Promise value`)
-  }
-  if (value == null || type === '[object RegExp]') {
-    return String(value)
-  }
-  if (typeof value === 'object' && type === '[object Object]') {
-    const entries = Object.entries(value).map(
-      ([k, v]) => `${JSON.stringify(k)}: ${stringifyValue(v)}`,
-    )
-    return `{ ${entries.join(', ')} }`
-  }
-  if (type === '[object Date]') {
-    return `new Date(${(value as Date).getTime()})`
-  }
-  return JSON.stringify(value)
 }
