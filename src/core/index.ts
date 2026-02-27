@@ -80,33 +80,34 @@ export async function transformMacros(
   const macros = collectMacros()
   const skip = new Set<Macro>()
 
-  if (macros.length > 0) {
-    const runner = await getRunner()
-    deps.set(id, new Set())
-
-    for (const macro of macros) {
-      if (skip.has(macro)) {
-        continue
-      }
-
-      const result = await executeMacro(macro, runner, id)
-      const stringified = stringifyValue(result)
-
-      // Handle shorthand property in object literals: { foo } -> { foo: value }
-      const { parent } = macro
-      if (
-        parent?.type === 'ObjectProperty' &&
-        parent.shorthand &&
-        macro.type === 'identifier' &&
-        parent.key.type === 'Identifier'
-      ) {
-        s.overwriteNode(macro.node, `${parent.key.name}: ${stringified}`)
-      } else {
-        s.overwriteNode(macro.node, stringified)
-      }
-    }
-  } else {
+  if (!macros.length) {
     deps.delete(id)
+    return
+  }
+
+  const runner = await getRunner()
+  deps.set(id, new Set())
+
+  for (const macro of macros) {
+    if (skip.has(macro)) {
+      continue
+    }
+
+    const result = await executeMacro(macro, runner, id)
+    const stringified = stringifyValue(result)
+
+    // Handle shorthand property in object literals: { foo } -> { foo: value }
+    const { parent } = macro
+    if (
+      parent?.type === 'ObjectProperty' &&
+      parent.shorthand &&
+      macro.type === 'identifier' &&
+      parent.key.type === 'Identifier'
+    ) {
+      s.overwriteNode(macro.node, `${parent.key.name}: ${stringified}`)
+    } else {
+      s.overwriteNode(macro.node, stringified)
+    }
   }
 
   function collectMacros() {
