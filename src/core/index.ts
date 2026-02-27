@@ -87,7 +87,7 @@ export async function transformMacros(
 
   const runner = await getRunner()
   deps.set(id, new Set())
-  let needEcho = false
+  let needWrap = false
 
   for (const macro of macros) {
     if (skip.has(macro)) {
@@ -111,7 +111,7 @@ export async function transformMacros(
     }
   }
 
-  if (needEcho) {
+  if (needWrap) {
     s.prepend(`function $macros$wrap(value) { return value }\n`)
   }
 
@@ -313,7 +313,7 @@ export async function transformMacros(
       return `${value}n`
     }
     if (ty === 'function') {
-      needEcho = true
+      needWrap = true
       return `$macros$wrap(${(value as Function).toString()})`
     }
     if (ty === 'symbol') {
