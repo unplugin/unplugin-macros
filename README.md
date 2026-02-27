@@ -93,6 +93,18 @@ export function getRandom() {
 export const buildTime = Date.now()
 ```
 
+### Function Arguments
+
+You can pass function values as arguments to macros. Functions must be isolated (no references to outside identifiers):
+
+```js
+// main.js
+import { transform } from './macros' with { type: 'macro' }
+
+transform(() => 42)
+transform(async () => await Promise.resolve(42))
+```
+
 See more in [Bun Macros](https://bun.sh/blog/bun-macros).
 
 ### TypeScript

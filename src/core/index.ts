@@ -74,7 +74,7 @@ export async function transformMacros(
 
   const source = options.s.toString()
   const program = babelParse(source, getLang(id))
-  const s = new MagicStringAST(options.s)
+  const s = new MagicStringAST(options.s as any)
 
   const imports = new Map(Object.entries(recordImports()))
   const macros = collectMacros()
@@ -165,6 +165,7 @@ export async function transformMacros(
             type: 'call',
             node: isAwait ? parent : node,
             id,
+            // eslint-disable-next-line baseline-js/use-baseline
             args: node.arguments,
             isAwait,
             parent,
