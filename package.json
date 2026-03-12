@@ -2,7 +2,7 @@
   "name": "unplugin-macros",
   "type": "module",
   "version": "0.19.0",
-  "packageManager": "pnpm@10.31.0",
+  "packageManager": "pnpm@10.32.1",
   "description": "Macros for bundlers.",
   "author": "Kevin Deng <sxzz@sxzz.moe>",
   "license": "MIT",
@@ -65,9 +65,9 @@
     "@babel/types": "^7.29.0",
     "ast-kit": "^2.2.0",
     "magic-string-ast": "^1.0.3",
-    "rolldown-string": "^0.2.1",
+    "rolldown-string": "^0.3.0",
     "unplugin": "^3.0.0",
-    "vite": "^7.3.1",
+    "vite": "^8.0.0",
     "vite-node": "^5.3.0"
   },
   "devDependencies": {
@@ -76,19 +76,19 @@
     "@sxzz/prettier-config": "^2.3.1",
     "@sxzz/test-utils": "^0.5.15",
     "@types/dedent": "^0.7.2",
-    "@types/node": "^25.3.5",
-    "@typescript/native-preview": "7.0.0-dev.20260308.1",
+    "@types/node": "^25.4.0",
+    "@typescript/native-preview": "7.0.0-dev.20260312.1",
     "bumpp": "^10.4.1",
     "dedent": "^1.7.2",
     "eslint": "^10.0.3",
     "fast-glob": "^3.3.3",
     "prettier": "^3.8.1",
     "rollup": "^4.59.0",
-    "tsdown": "^0.21.0",
-    "tsdown-preset-sxzz": "^0.4.0",
+    "tsdown": "^0.21.2",
+    "tsdown-preset-sxzz": "^0.4.2",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.18",
-    "vue": "^3.5.29"
+    "vitest": "^4.1.0",
+    "vue": "^3.5.30"
   },
   "prettier": "@sxzz/prettier-config"
 }
