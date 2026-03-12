@@ -1,6 +1,6 @@
 import { rollupBuild, testFixtures } from '@sxzz/test-utils'
 import { describe, vi } from 'vitest'
-import Macros from '../src/rollup'
+import Macros from '../src/rollup.ts'
 
 vi.spyOn(Math, 'random').mockReturnValue(0.5)
 

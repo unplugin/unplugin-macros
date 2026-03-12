@@ -90,5 +90,8 @@
     "vitest": "^4.1.0",
     "vue": "^3.5.30"
   },
+  "resolutions": {
+    "vite": "^8.0.0"
+  },
   "prettier": "@sxzz/prettier-config"
 }

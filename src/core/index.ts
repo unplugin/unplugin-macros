@@ -22,8 +22,8 @@ import type { RolldownString } from 'rolldown-string'
 import type { UnpluginBuildContext, UnpluginContext } from 'unplugin'
 import type { ViteNodeRunner } from 'vite-node/client'
 
-export * from './define'
-export * from './options'
+export * from './define.ts'
+export * from './options.ts'
 
 /**
  * Represents the context object passed to macros.

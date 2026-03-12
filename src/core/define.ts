@@ -1,4 +1,4 @@
-import type { MacroContext } from './index'
+import type { MacroContext } from './index.ts'
 
 /**
  * A TypeScript helper function that defines a macro.

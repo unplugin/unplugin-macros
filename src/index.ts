@@ -8,15 +8,15 @@ import { createUnplugin, type UnpluginInstance } from 'unplugin'
 import { ViteNodeRunner } from 'vite-node/client'
 import { ViteNodeServer } from 'vite-node/server'
 import { installSourcemapsSupport } from 'vite-node/source-map'
-import { transformMacros } from './core'
+import { transformMacros } from './core/index.ts'
 import {
   resolveOptions,
   type Options,
   type OptionsResolved,
-} from './core/options'
+} from './core/options.ts'
 import type { ModuleNode, ViteDevServer } from 'vite'
 
-export type { MacroContext, Options } from './core'
+export type { MacroContext, Options } from './core/index.ts'
 
 async function initServer(options: OptionsResolved) {
   const { createServer } = await import('vite')
