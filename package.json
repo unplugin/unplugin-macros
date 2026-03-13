@@ -68,7 +68,7 @@
     "rolldown-string": "^0.3.0",
     "unplugin": "^3.0.0",
     "vite": "^8.0.0",
-    "vite-node": "^5.3.0"
+    "vite-node": "^6.0.0"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.28.6",
@@ -76,8 +76,8 @@
     "@sxzz/prettier-config": "^2.3.1",
     "@sxzz/test-utils": "^0.5.15",
     "@types/dedent": "^0.7.2",
-    "@types/node": "^25.4.0",
-    "@typescript/native-preview": "7.0.0-dev.20260312.1",
+    "@types/node": "^25.5.0",
+    "@typescript/native-preview": "7.0.0-dev.20260313.1",
     "bumpp": "^10.4.1",
     "dedent": "^1.7.2",
     "eslint": "^10.0.3",
@@ -89,9 +89,6 @@
     "typescript": "^5.9.3",
     "vitest": "^4.1.0",
     "vue": "^3.5.30"
-  },
-  "resolutions": {
-    "vite": "^8.0.0"
   },
   "prettier": "@sxzz/prettier-config"
 }
