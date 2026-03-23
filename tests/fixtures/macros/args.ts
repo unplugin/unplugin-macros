@@ -1,3 +1,3 @@
-export function arg<T>(arg: T) {
+export function arg<T>(arg: T): T {
   return arg
 }
