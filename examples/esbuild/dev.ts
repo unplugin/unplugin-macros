@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 
 import { context } from 'esbuild'
-import Macros from '../../src/esbuild'
+import Macros from '../../src/esbuild.ts'
 
 const ctx = await context({
   entryPoints: ['src/main.ts'],

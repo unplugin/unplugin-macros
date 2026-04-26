@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 
 import { build } from 'esbuild'
-import Macros from '../../src/esbuild'
+import Macros from '../../src/esbuild.ts'
 
 await build({
   entryPoints: ['src/main.ts'],

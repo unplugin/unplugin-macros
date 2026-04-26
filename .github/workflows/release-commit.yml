@@ -5,6 +5,6 @@ permissions: {}
 
 jobs:
   release:
-    uses: sxzz/workflows/.github/workflows/release-commit.yml@v2
+    uses: sxzz/workflows/.github/workflows/release-commit.yml@main
     with:
       compact: true

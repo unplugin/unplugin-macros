@@ -2,12 +2,11 @@
   "type": "module",
   "version": "1.0.0",
   "scripts": {
-    "build": "tsx build.ts",
-    "watch": "tsx watch build.ts",
-    "dev": "tsx watch dev.ts"
+    "build": "node build.ts",
+    "watch": "node --watch build.ts",
+    "dev": "node --watch dev.ts"
   },
   "devDependencies": {
-    "esbuild": "^0.27.4",
-    "tsx": "^4.21.0"
+    "esbuild": "^0.28.0"
   }
 }
