@@ -15,3 +15,11 @@ test('define', () => {
   })
   expectTypeOf(fn2).toEqualTypeOf<(p: number) => number>()
 })
+
+test('ast context', () => {
+  defineMacro(function () {
+    expectTypeOf(this.ast.call.type).toEqualTypeOf<'CallExpression'>()
+    expectTypeOf(this.ast.program.type).toEqualTypeOf<'Program'>()
+    return ''
+  })
+})

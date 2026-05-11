@@ -107,6 +107,39 @@ transform(async () => await Promise.resolve(42))
 
 See more in [Bun Macros](https://bun.sh/blog/bun-macros).
 
+### MacroContext
+
+Every macro is invoked with a `MacroContext` as its `this`. The most useful fields are:
+
+| Field             | Description                                                                       |
+| ----------------- | --------------------------------------------------------------------------------- |
+| `id`              | Absolute path of the file being transformed.                                      |
+| `source`          | Full source code of the file.                                                     |
+| `ast.call`        | `CallExpression` AST node of this macro invocation (`await` / tagged template are unwrapped). |
+| `ast.program`     | `Program` AST of the whole file.                                                  |
+| `emitFile`        | Emit additional bundle assets.                                                    |
+| `unpluginContext` | The underlying unplugin build context — experimental, may change.                 |
+
+`ast.call` carries the standard Babel location info (`loc`, `start`, `end`), which is enough to build callsite-aware macros without paying for a runtime stack walk:
+
+```ts
+// macros.ts
+import path from 'node:path'
+import type { MacroContext } from 'unplugin-macros'
+
+export function $callsite(this: MacroContext): string {
+  const { line, column } = this.ast.call.loc!.start
+  return `${path.basename(this.id)}:${line}:${column}`
+}
+```
+
+```ts
+// main.ts
+import { $callsite } from './macros.ts' with { type: 'macro' }
+
+console.log($callsite()) // → 'main.ts:3:12'
+```
+
 ### TypeScript
 
 Import Attributes syntax is supported in TypeScript 5.3 and above.

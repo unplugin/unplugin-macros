@@ -26,12 +26,38 @@ export * from './define.ts'
 export * from './options.ts'
 
 /**
+ * AST handles for a macro invocation.
+ */
+export interface MacroAst {
+  /**
+   * The AST node of the macro call expression.
+   *
+   * - For `await fn()` macros this is the inner `CallExpression`, not the
+   *   wrapping `AwaitExpression`.
+   * - For tagged template macros (`` fn`...` ``) this is a synthesized
+   *   `CallExpression` whose `arguments` is `[quasi]` and whose
+   *   `.loc`/`.start`/`.end` match the original `TaggedTemplateExpression`.
+   */
+  call: t.CallExpression
+  /** The `Program` AST of the file being transformed. */
+  program: t.Program
+}
+
+/**
  * Represents the context object passed to macros.
  */
 export interface MacroContext {
   id: string
   source: string
   emitFile: UnpluginBuildContext['emitFile']
+  /**
+   * AST handles for this macro invocation and its enclosing file.
+   *
+   * Use `ast.call` to inspect the call expression (e.g. `ast.call.loc!.start.line`
+   * for the line number, `source.slice(ast.call.start!, ast.call.end!)` for the
+   * raw call source). Use `ast.program` to walk over the rest of the file.
+   */
+  ast: MacroAst
   /**
    * **Use with caution.**
    *
@@ -354,11 +380,19 @@ export async function transformMacros(
 
     let result: any
     if (macro.type === 'call') {
+      const callNode: t.CallExpression =
+        macro.node.type === 'AwaitExpression'
+          ? (macro.node.argument as t.CallExpression)
+          : (macro.node as t.CallExpression)
+
       const ctx: MacroContext = {
         id,
         source,
         emitFile: unpluginContext.emitFile,
-
+        ast: {
+          call: callNode,
+          program,
+        },
         unpluginContext,
       }
 
