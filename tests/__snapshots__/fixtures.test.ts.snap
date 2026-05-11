@@ -14,6 +14,14 @@ console.log([1, false, "hello", undefined, null, 2n]);
 "
 `;
 
+exports[`fixture > fixtures/ast.js 1`] = `
+"// ast.js
+const ast = { "line": 3, "column": 19, "calleeName": "getAst", "callSource": "getAst()", "programType": "Program" };
+
+export { ast };
+"
+`;
+
 exports[`fixture > fixtures/basic.js 1`] = `
 "// basic.js
 0.5 === 0.5;
