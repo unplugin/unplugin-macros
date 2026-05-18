@@ -56,7 +56,7 @@
   "dependencies": {
     "@babel/types": "^7.29.0",
     "ast-kit": "^2.2.0",
-    "magic-string-ast": "^1.0.3",
+    "magic-string-ast": "^2.0.0",
     "rolldown-string": "^0.3.0",
     "unplugin": "^3.0.0",
     "vite": "^8.0.12",
