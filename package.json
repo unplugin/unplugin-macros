@@ -2,7 +2,7 @@
   "name": "unplugin-macros",
   "type": "module",
   "version": "0.20.0",
-  "packageManager": "pnpm@11.5.0",
+  "packageManager": "pnpm@11.7.0",
   "description": "Macros for bundlers.",
   "author": "Kevin Deng <sxzz@sxzz.moe>",
   "license": "MIT",
@@ -40,7 +40,7 @@
     "access": "public"
   },
   "engines": {
-    "node": "^22.18.0 || >=24.0.0"
+    "node": "^22.18.0 || >=24.11.0"
   },
   "scripts": {
     "lint": "eslint .",
@@ -54,8 +54,8 @@
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
-    "@babel/types": "^7.29.0",
-    "ast-kit": "^2.2.0",
+    "@babel/types": "^7.29.7",
+    "ast-kit": "^3.0.0",
     "magic-string-ast": "^2.0.0",
     "rolldown-string": "^0.3.0",
     "unplugin": "^3.0.0",
@@ -63,23 +63,23 @@
     "vite-node": "^6.0.0"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "^7.28.6",
-    "@sxzz/eslint-config": "^8.1.0",
+    "@babel/eslint-parser": "^8.0.0",
+    "@sxzz/eslint-config": "^8.2.1",
     "@sxzz/prettier-config": "^2.3.1",
     "@sxzz/test-utils": "^0.5.18",
     "@types/dedent": "^0.7.2",
-    "@types/node": "^25.6.2",
-    "@typescript/native-preview": "7.0.0-dev.20260527.2",
+    "@types/node": "^25.9.3",
+    "@typescript/native-preview": "7.0.0-dev.20260616.1",
     "bumpp": "^11.1.0",
     "dedent": "^1.7.2",
-    "eslint": "^10.3.0",
-    "prettier": "^3.8.3",
-    "rollup": "^4.60.3",
-    "tsdown": "^0.22.0",
+    "eslint": "^10.5.0",
+    "prettier": "^3.8.4",
+    "rollup": "^4.62.0",
+    "tsdown": "^0.22.2",
     "tsdown-preset-sxzz": "^0.6.0",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.6",
-    "vue": "^3.5.34"
+    "vitest": "^4.1.9",
+    "vue": "^3.5.38"
   },
   "prettier": "@sxzz/prettier-config"
 }

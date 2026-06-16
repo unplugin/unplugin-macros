@@ -3,3 +3,9 @@ packages:
 
 allowBuilds:
   esbuild: false
+
+minimumReleaseAge: 0
+shellEmulator: true
+trustLockfile: true
+trustPolicy: no-downgrade
+trustPolicyIgnoreAfter: 604800 # 7 days
