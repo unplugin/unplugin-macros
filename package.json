@@ -54,7 +54,7 @@
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
-    "@babel/types": "^7.29.7",
+    "@babel/types": "^8.0.0",
     "ast-kit": "^3.0.0",
     "magic-string-ast": "^2.0.0",
     "rolldown-string": "^0.3.0",
