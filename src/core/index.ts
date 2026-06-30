@@ -189,7 +189,6 @@ export async function transformMacros(
           node.type === 'CallExpression' &&
           isTypeOf(node.callee, ['Identifier', 'MemberExpression'])
         ) {
-          skip.add(node.callee)
           let id: string[]
           try {
             id = resolveIdentifier(node.callee)
@@ -197,6 +196,8 @@ export async function transformMacros(
             return
           }
           if (!imports.has(id[0]) || scope.contains(id[0])) return
+
+          skip.add(node.callee)
 
           macros.push({
             type: 'call',

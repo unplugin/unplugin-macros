@@ -35,6 +35,23 @@ const { bar = 1 } = {};
 "
 `;
 
+exports[`fixture > fixtures/chained-call.js 1`] = `
+"// chained-call.js
+function defineRoute(handler) {
+  return {
+    handler,
+    meta(extra) {
+      return { handler, ...extra }
+    },
+  }
+}
+
+const route = defineRoute(() => {
+  return 0.5
+}).meta({ seed: 0.5 });
+"
+`;
+
 exports[`fixture > fixtures/css.js 1`] = `
 "// css.js
 // prettier-ignore
