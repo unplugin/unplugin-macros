@@ -1,3 +1,4 @@
+import { hash } from 'node:crypto'
 import { isBuiltin } from 'node:module'
 import {
   attachScopes,
@@ -42,6 +43,26 @@ export interface MacroAst {
   /** The `Program` AST of the file being transformed. */
   program: t.Program
 }
+
+/**
+ * The import specifier prefix of virtual modules
+ * that hold deduplicated macro results (see the `virtualModules` option).
+ */
+export const VIRTUAL_ID_PREFIX = 'virtual:unplugin-macros/'
+
+/**
+ * The resolved id prefix (`\0`-prefixed) of virtual modules
+ * that hold deduplicated macro results (see the `virtualModules` option).
+ */
+export const RESOLVED_VIRTUAL_ID_PREFIX: string = `\0${VIRTUAL_ID_PREFIX}`
+
+/**
+ * The registry of virtual modules that hold deduplicated macro results,
+ * mapping a content hash to the module code.
+ * Entries are content-addressed, so they can be safely shared
+ * across plugin instances.
+ */
+export const virtualModules: Map<string, string> = new Map()
 
 /**
  * Represents the context object passed to macros.
@@ -91,6 +112,11 @@ export interface TransformOptions {
   unpluginContext: UnpluginBuildContext & UnpluginContext
   deps: Map<string, Set<string>>
   attrs: Record<string, string>
+  /**
+   * Extract macro results into shared virtual modules
+   * registered in the `virtualModules` map.
+   */
+  virtualModules?: boolean
   getRunner: () => Promise<ViteNodeRunner>
 }
 
@@ -111,6 +137,7 @@ export async function transformMacros(
   const macroExports = program.body.filter(isMacroExportDeclaration)
   const macros = collectMacros()
   const skip = new Set<Macro>()
+  const virtualImports = new Map<string, string>()
 
   if (!macros.length && !macroExports.length) {
     deps.delete(id)
@@ -132,7 +159,9 @@ export async function transformMacros(
     }
 
     const result = await executeMacro(macro, runner, id)
-    const stringified = stringifyValue(result)
+    const stringified = options.virtualModules
+      ? importValue(result)
+      : stringifyValue(result)
 
     // Handle shorthand property in object literals: { foo } -> { foo: value }
     const { parent } = macro
@@ -150,6 +179,30 @@ export async function transformMacros(
 
   if (needWrap) {
     s.prepend(`function $macros$wrap(value) { return value }\n`)
+  }
+
+  function importValue(value: unknown): string {
+    // `$macros$wrap` must be defined inside the self-contained virtual
+    // module, not in the host module, so track it separately here.
+    const outerNeedWrap = needWrap
+    needWrap = false
+    const stringified = stringifyValue(value)
+    const wrap = needWrap
+      ? `function $macros$wrap(value) { return value }\n`
+      : ''
+    needWrap = outerNeedWrap
+
+    const key = hash('sha256', stringified).slice(0, 16)
+    let local = virtualImports.get(key)
+    if (!local) {
+      local = `_macro_${key}`
+      virtualImports.set(key, local)
+      virtualModules.set(key, `${wrap}export default ${stringified}\n`)
+      s.prepend(
+        `import ${local} from ${JSON.stringify(VIRTUAL_ID_PREFIX + key)};\n`,
+      )
+    }
+    return local
   }
 
   function collectMacros() {

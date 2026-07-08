@@ -8,7 +8,12 @@ import { createUnplugin, type UnpluginInstance } from 'unplugin'
 import { ViteNodeRunner } from 'vite-node/client'
 import { ViteNodeServer } from 'vite-node/server'
 import { installSourcemapsSupport } from 'vite-node/source-map'
-import { transformMacros } from './core/index.ts'
+import {
+  RESOLVED_VIRTUAL_ID_PREFIX,
+  transformMacros,
+  VIRTUAL_ID_PREFIX,
+  virtualModules,
+} from './core/index.ts'
 import {
   resolveOptions,
   type Options,
@@ -99,6 +104,29 @@ const plugin: UnpluginInstance<Options | undefined, false> = createUnplugin<
       }
     },
 
+    ...(options.virtualModules && {
+      resolveId(id) {
+        if (id.startsWith(VIRTUAL_ID_PREFIX)) {
+          return RESOLVED_VIRTUAL_ID_PREFIX + id.slice(VIRTUAL_ID_PREFIX.length)
+        }
+      },
+
+      load(id) {
+        if (id.startsWith(RESOLVED_VIRTUAL_ID_PREFIX)) {
+          const code = virtualModules.get(
+            id.slice(RESOLVED_VIRTUAL_ID_PREFIX.length),
+          )
+          if (code == null) {
+            throw new Error(
+              `Macro virtual module ${id} is not found. ` +
+                `It may be caused by a stale bundler cache from a previous build; try clearing the cache.`,
+            )
+          }
+          return code
+        }
+      },
+    }),
+
     transform: {
       filter: { id: { include, exclude } },
       handler: withMagicString(function (s, id) {
@@ -108,6 +136,7 @@ const plugin: UnpluginInstance<Options | undefined, false> = createUnplugin<
           getRunner,
           deps,
           attrs: options.attrs,
+          virtualModules: options.virtualModules,
           unpluginContext: this,
         })
       }),
