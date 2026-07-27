@@ -70,7 +70,7 @@
     "@types/dedent": "^0.7.2",
     "@types/node": "^25.9.3",
     "@typescript/native-preview": "7.0.0-dev.20260707.2",
-    "bumpp": "^11.1.0",
+    "bumpp": "^12.0.0",
     "dedent": "^1.7.2",
     "eslint": "^10.5.0",
     "prettier": "^3.8.4",
