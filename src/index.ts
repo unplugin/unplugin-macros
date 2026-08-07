@@ -9,10 +9,9 @@ import { ViteNodeRunner } from 'vite-node/client'
 import { ViteNodeServer } from 'vite-node/server'
 import { installSourcemapsSupport } from 'vite-node/source-map'
 import {
-  RESOLVED_VIRTUAL_ID_PREFIX,
   transformMacros,
+  VIRTUAL_ID_PATTERN,
   VIRTUAL_ID_PREFIX,
-  virtualModules,
 } from './core/index.ts'
 import {
   resolveOptions,
@@ -52,6 +51,16 @@ const plugin: UnpluginInstance<Options | undefined, false> = createUnplugin<
   let runner: ViteNodeRunner | undefined
 
   const deps: Map<string, Set<string>> = new Map()
+
+  /**
+   * The registry of virtual modules that hold deduplicated macro results,
+   * mapping a content hash to the module code.
+   * Entries are content-addressed, so they can be safely shared
+   * across plugin instances.
+   */
+  const virtualModules = options.virtualModules
+    ? new Map<string, string>()
+    : undefined
 
   let initPromise: Promise<void> | undefined
   function init() {
@@ -104,18 +113,16 @@ const plugin: UnpluginInstance<Options | undefined, false> = createUnplugin<
       }
     },
 
-    ...(options.virtualModules && {
-      resolveId(id) {
-        if (id.startsWith(VIRTUAL_ID_PREFIX)) {
-          return RESOLVED_VIRTUAL_ID_PREFIX + id.slice(VIRTUAL_ID_PREFIX.length)
-        }
+    ...(virtualModules && {
+      resolveId: {
+        filter: { id: VIRTUAL_ID_PATTERN },
+        handler: (id) => id,
       },
 
-      load(id) {
-        if (id.startsWith(RESOLVED_VIRTUAL_ID_PREFIX)) {
-          const code = virtualModules.get(
-            id.slice(RESOLVED_VIRTUAL_ID_PREFIX.length),
-          )
+      load: {
+        filter: { id: VIRTUAL_ID_PATTERN },
+        handler(id) {
+          const code = virtualModules.get(id.slice(VIRTUAL_ID_PREFIX.length))
           if (code == null) {
             throw new Error(
               `Macro virtual module ${id} is not found. ` +
@@ -123,7 +130,7 @@ const plugin: UnpluginInstance<Options | undefined, false> = createUnplugin<
             )
           }
           return code
-        }
+        },
       },
     }),
 
@@ -136,7 +143,7 @@ const plugin: UnpluginInstance<Options | undefined, false> = createUnplugin<
           getRunner,
           deps,
           attrs: options.attrs,
-          virtualModules: options.virtualModules,
+          virtualModules,
           unpluginContext: this,
         })
       }),

@@ -44,25 +44,8 @@ export interface MacroAst {
   program: t.Program
 }
 
-/**
- * The import specifier prefix of virtual modules
- * that hold deduplicated macro results (see the `virtualModules` option).
- */
 export const VIRTUAL_ID_PREFIX = 'virtual:unplugin-macros/'
-
-/**
- * The resolved id prefix (`\0`-prefixed) of virtual modules
- * that hold deduplicated macro results (see the `virtualModules` option).
- */
-export const RESOLVED_VIRTUAL_ID_PREFIX: string = `\0${VIRTUAL_ID_PREFIX}`
-
-/**
- * The registry of virtual modules that hold deduplicated macro results,
- * mapping a content hash to the module code.
- * Entries are content-addressed, so they can be safely shared
- * across plugin instances.
- */
-export const virtualModules: Map<string, string> = new Map()
+export const VIRTUAL_ID_PATTERN: RegExp = /^virtual:unplugin-macros\//
 
 /**
  * Represents the context object passed to macros.
@@ -106,17 +89,13 @@ type MacroExportDeclaration = (
   | t.ExportAllDeclaration
 ) & { source: t.StringLiteral }
 
-export interface TransformOptions {
+export interface TransformContext {
   id: string
   s: RolldownString
   unpluginContext: UnpluginBuildContext & UnpluginContext
   deps: Map<string, Set<string>>
   attrs: Record<string, string>
-  /**
-   * Extract macro results into shared virtual modules
-   * registered in the `virtualModules` map.
-   */
-  virtualModules?: boolean
+  virtualModules?: Map<string, string>
   getRunner: () => Promise<ViteNodeRunner>
 }
 
@@ -124,13 +103,13 @@ export interface TransformOptions {
  * Transforms macros in the given source code.
  */
 export async function transformMacros(
-  options: TransformOptions,
+  context: TransformContext,
 ): Promise<void> {
-  const { id, unpluginContext, deps, attrs, getRunner } = options
+  const { id, unpluginContext, deps, attrs, getRunner } = context
 
-  const source = options.s.toString()
+  const source = context.s.toString()
   const program = babelParse(source, getLang(id))
-  const s = new MagicStringAST(options.s as any)
+  const s = new MagicStringAST(context.s as any)
   let generatedExportIndex = 0
 
   const imports = new Map(Object.entries(recordImports()))
@@ -159,7 +138,7 @@ export async function transformMacros(
     }
 
     const result = await executeMacro(macro, runner, id)
-    const stringified = options.virtualModules
+    const stringified = context.virtualModules
       ? importValue(result)
       : stringifyValue(result)
 
@@ -197,7 +176,7 @@ export async function transformMacros(
     if (!local) {
       local = `_macro_${key}`
       virtualImports.set(key, local)
-      virtualModules.set(key, `${wrap}export default ${stringified}\n`)
+      context.virtualModules?.set(key, `${wrap}export default ${stringified}\n`)
       s.prepend(
         `import ${local} from ${JSON.stringify(VIRTUAL_ID_PREFIX + key)};\n`,
       )
