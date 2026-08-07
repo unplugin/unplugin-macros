@@ -151,6 +151,7 @@ exports[`fixture > fixtures/promise.js 1`] = `
 "// promise.js
 const a = "ok";
 const b = "ok";
+const c = 42;
 "
 `;
 

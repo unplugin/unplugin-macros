@@ -484,8 +484,11 @@ export async function transformMacros(
           },
         })
 
+        const AsyncFunction = Object.getPrototypeOf(
+          async function () {},
+        ).constructor
         try {
-          args.push(new Function(`return (${s.toString()})`)())
+          args.push(await new AsyncFunction(`return (${s.toString()})`)())
           continue
         } catch {}
 
