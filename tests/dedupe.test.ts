@@ -1,8 +1,7 @@
 import path from 'node:path'
-import { rollupBuild } from '@sxzz/test-utils'
 import { describe, expect, test } from 'vitest'
 import { resolveOptions } from '../src/core/options.ts'
-import Macros from '../src/rollup.ts'
+import { build } from './_utils.ts'
 
 const entry = path.resolve(import.meta.dirname, 'fixtures/dedupe/entry.js')
 
@@ -12,16 +11,14 @@ describe('dedupe', () => {
   })
 
   test('inlines macro results when disabled', async () => {
-    const { snapshot } = await rollupBuild(entry, [Macros()])
+    const { snapshot } = await build(entry)
     // `config` is used twice in a.js, once via getConfig() in b.js,
     // and once as a shorthand property in c.js
     expect(snapshot.match(/dedupe-marker/g)).toHaveLength(4)
   })
 
   test('extracts macro results into shared virtual modules', async () => {
-    const { snapshot } = await rollupBuild(entry, [
-      Macros({ virtualModules: true }),
-    ])
+    const { snapshot } = await build(entry, { virtualModules: true })
     expect(snapshot).toMatchSnapshot()
     // the same value is emitted only once and shared across modules,
     // while distinct values get their own virtual modules

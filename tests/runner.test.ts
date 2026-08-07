@@ -1,12 +1,11 @@
 import fs from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
-import { rollupBuild } from '@sxzz/test-utils'
 import { describe, expect, test } from 'vitest'
 import { resolveOptions } from '../src/core/options.ts'
-import Macros from '../src/rollup.ts'
 import { nativeRunner } from '../src/runner/native.ts'
 import { unrunRunner } from '../src/runner/unrun.ts'
+import { build } from './_utils.ts'
 
 const fixtures = path.resolve(import.meta.dirname, 'fixtures')
 const importer = path.join(fixtures, 'basic.js')
@@ -57,25 +56,23 @@ describe('runner option', () => {
   test('uses a custom runner', async () => {
     const resolved: string[] = []
     let initCalls = 0
-    const { snapshot } = await rollupBuild(path.join(fixtures, 'basic.js'), [
-      Macros({
-        runner: {
-          init() {
-            initCalls++
-          },
-          resolve(source, importer) {
-            resolved.push(source)
-            return path.resolve(path.dirname(importer), source)
-          },
-          import: () => ({
-            getRandom: () => 'custom-runner',
-            inc: () => 0,
-            foo: 'custom-foo',
-            _undefined: undefined,
-          }),
+    const { snapshot } = await build(path.join(fixtures, 'basic.js'), {
+      runner: {
+        init() {
+          initCalls++
         },
-      }),
-    ])
+        resolve(source, importer) {
+          resolved.push(source)
+          return path.resolve(path.dirname(importer), source)
+        },
+        import: () => ({
+          getRandom: () => 'custom-runner',
+          inc: () => 0,
+          foo: 'custom-foo',
+          _undefined: undefined,
+        }),
+      },
+    })
 
     expect(initCalls).toBe(1)
     expect(resolved).toContain('./macros/rand.js')
@@ -85,17 +82,15 @@ describe('runner option', () => {
 
   test('never inits the runner when no macro is used', async () => {
     let initCalls = 0
-    await rollupBuild(path.join(fixtures, 'macros/rand.js'), [
-      Macros({
-        runner: {
-          init() {
-            initCalls++
-          },
-          resolve: (source) => source,
-          import: () => ({}),
+    await build(path.join(fixtures, 'macros/rand.js'), {
+      runner: {
+        init() {
+          initCalls++
         },
-      }),
-    ])
+        resolve: (source) => source,
+        import: () => ({}),
+      },
+    })
     expect(initCalls).toBe(0)
   })
 })
@@ -172,8 +167,8 @@ describe.for([
 describe('unrunRunner', () => {
   test('produces the same output as the default runner', async () => {
     const entry = path.join(fixtures, 'args.js')
-    const native = await rollupBuild(entry, [Macros()])
-    const unrun = await rollupBuild(entry, [Macros({ runner: unrunRunner() })])
+    const native = await build(entry)
+    const unrun = await build(entry, { runner: unrunRunner() })
     expect(unrun.snapshot).toBe(native.snapshot)
   })
 

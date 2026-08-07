@@ -1,6 +1,6 @@
-import { rolldownBuild, testFixtures } from '@sxzz/test-utils'
+import { testFixtures } from '@sxzz/test-utils'
 import { describe, vi } from 'vitest'
-import Macros from '../src/rolldown.ts'
+import { build } from './_utils.ts'
 
 vi.spyOn(Math, 'random').mockReturnValue(0.5)
 
@@ -9,17 +9,7 @@ describe('fixture', async () => {
     'fixtures/*.{js,ts}',
     async (args, id) =>
       (
-        await rolldownBuild(
-          id,
-          Macros(),
-          {
-            treeshake: false,
-            experimental: {
-              attachDebugInfo: 'none',
-            },
-          },
-          { minify: false },
-        ).catch((error: any) => {
+        await build(id).catch((error: any) => {
           if (error.errors) {
             throw error.errors.map(String)
           }

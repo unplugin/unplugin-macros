@@ -2,28 +2,47 @@
 
 exports[`dedupe > extracts macro results into shared virtual modules 1`] = `
 "// entry.js
-var _macro_831c446d122a4b37 = { "marker": "dedupe-marker", "items": [1, 2, 3] };
+var _831c446d122a4b37_default = {
+	"marker": "dedupe-marker",
+	"items": [
+		1,
+		2,
+		3
+	]
+};
 
-const a = _macro_831c446d122a4b37;
-const a2 = _macro_831c446d122a4b37;
+const a = _831c446d122a4b37_default;
+const a2 = _831c446d122a4b37_default;
 
-const b = _macro_831c446d122a4b37;
+const b = _831c446d122a4b37_default;
 
-function $macros$wrap(value) { return value }
-var _macro_4cbe142ca217ca08 = $macros$wrap(() => 'fn-value');
+function $macros$wrap(value) {
+	return value;
+}
+var _4cbe142ca217ca08_default = $macros$wrap(() => "fn-value");
 
-var _macro_1172e626a0391c41 = { "marker": "args-marker", "items": [0, 1] };
+var _1172e626a0391c41_default = {
+	"marker": "args-marker",
+	"items": [0, 1]
+};
 
-var _macro_c7f98bd1374b2a60 = "async-value";
+var c7f98bd1374b2a60_default = "async-value";
 
-const c = { config: _macro_831c446d122a4b37 };
-const d = _macro_c7f98bd1374b2a60;
-const e = _macro_1172e626a0391c41;
-const f = _macro_4cbe142ca217ca08;
+const c = { config: _831c446d122a4b37_default };
+const d = c7f98bd1374b2a60_default;
+const e = _1172e626a0391c41_default;
+const f = _4cbe142ca217ca08_default;
 
-const all = [a, a2, b, c, d, e, f];
+const all = [
+	a,
+	a2,
+	b,
+	c,
+	d,
+	e,
+	f
+];
 const shared = a === b;
 
-export { all, shared };
-"
+export { all, shared };"
 `;
