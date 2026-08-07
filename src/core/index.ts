@@ -256,10 +256,12 @@ export async function transformMacros(
 
         if (call) {
           if (!is.oneOf(call.callee, ['Identifier', 'MemberExpression'])) return
-          skippedNodes.add(call.callee)
 
           const resolved = resolveMacro(call.callee)
           if (!resolved) return
+
+          // Skip the callee only once the call is known to be a macro.
+          skippedNodes.add(call.callee)
 
           macros.push({
             type: 'call',
