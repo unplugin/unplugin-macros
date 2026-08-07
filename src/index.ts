@@ -167,7 +167,7 @@ const plugin: UnpluginInstance<Options | undefined, false> = createUnplugin<
 
         const affected = new Set<ModuleNode>()
 
-        for (const [id, macrosIds] of deps.entries()) {
+        for (const [id, macrosIds] of deps) {
           if (!macrosIds.has(file)) continue
           server.moduleGraph
             .getModulesByFile(id)

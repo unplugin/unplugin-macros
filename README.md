@@ -102,7 +102,10 @@ You can pass function values as arguments to macros. Functions must be isolated 
 import { transform } from './macros' with { type: 'macro' }
 
 transform(() => 42)
-transform(async () => await Promise.resolve(42))
+transform(async () => {
+  const os = await import('node:os')
+  return os.endianness()
+})
 ```
 
 See more in [Bun Macros](https://bun.sh/blog/bun-macros).
@@ -120,7 +123,7 @@ Every macro is invoked with a `MacroContext` as its `this`. The most useful fiel
 | `emitFile`        | Emit additional bundle assets.                                                    |
 | `unpluginContext` | The underlying unplugin build context — experimental, may change.                 |
 
-`ast.call` carries the standard Babel location info (`loc`, `start`, `end`), which is enough to build callsite-aware macros without paying for a runtime stack walk:
+`ast.call` carries the source offsets (`start`, `end`) of the invocation, which is enough to build callsite-aware macros without paying for a runtime stack walk:
 
 ```ts
 // macros.ts
@@ -128,7 +131,9 @@ import path from 'node:path'
 import type { MacroContext } from 'unplugin-macros'
 
 export function $callsite(this: MacroContext): string {
-  const { line, column } = this.ast.call.loc!.start
+  const before = this.source.slice(0, this.ast.call.start)
+  const line = before.split('\n').length
+  const column = this.ast.call.start - (before.lastIndexOf('\n') + 1)
   return `${path.basename(this.id)}:${line}:${column}`
 }
 ```
