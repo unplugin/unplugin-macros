@@ -80,7 +80,7 @@
     "dedent": "^1.7.2",
     "eslint": "^10.8.0",
     "prettier": "^3.9.6",
-    "rollup": "^4.62.4",
+    "rolldown": "^1.2.3",
     "tsdown": "^0.22.14",
     "tsdown-preset-sxzz": "^0.7.0",
     "typescript": "^6.0.3",

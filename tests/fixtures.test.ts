@@ -1,6 +1,6 @@
-import { rollupBuild, testFixtures } from '@sxzz/test-utils'
+import { rolldownBuild, testFixtures } from '@sxzz/test-utils'
 import { describe, vi } from 'vitest'
-import Macros from '../src/rollup.ts'
+import Macros from '../src/rolldown.ts'
 
 vi.spyOn(Math, 'random').mockReturnValue(0.5)
 
@@ -9,15 +9,22 @@ describe('fixture', async () => {
     'fixtures/*.{js,ts}',
     async (args, id) =>
       (
-        await rollupBuild(id, [
+        await rolldownBuild(
+          id,
           Macros(),
           {
-            name: 'strip-types',
-            transform(code) {
-              return code.replaceAll('as any', '')
+            treeshake: false,
+            experimental: {
+              attachDebugInfo: 'none',
             },
           },
-        ])
+          { minify: false },
+        ).catch((error: any) => {
+          if (error.errors) {
+            throw error.errors.map(String)
+          }
+          throw error
+        })
       ).snapshot,
     {
       cwd: import.meta.dirname,
