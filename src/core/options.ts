@@ -43,6 +43,16 @@ export interface Options {
    * @default { "type": "macro" }
    */
   attrs?: Record<string, string>
+
+  /**
+   * Extract macro results into shared virtual modules instead of inlining
+   * the serialized value at every usage site,
+   * so the same data is emitted only once in the bundle.
+   *
+   * Note that all usage sites will share a single value instance.
+   * @default false
+   */
+  virtualModules?: boolean
 }
 
 /**
@@ -70,5 +80,6 @@ export function resolveOptions(options: Options): OptionsResolved {
     viteConfig: options.viteConfig || {},
     enforce: 'enforce' in options ? options.enforce : 'pre',
     attrs: options.attrs || { type: 'macro' },
+    virtualModules: options.virtualModules ?? false,
   }
 }
