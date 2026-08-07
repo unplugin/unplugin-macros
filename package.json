@@ -1,7 +1,7 @@
 {
   "name": "unplugin-macros",
   "type": "module",
-  "version": "0.22.0",
+  "version": "0.23.0",
   "packageManager": "pnpm@11.20.0",
   "description": "Macros for bundlers.",
   "author": "Kevin Deng <sxzz@sxzz.moe>",
