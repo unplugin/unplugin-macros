@@ -8,7 +8,11 @@ import { createUnplugin, type UnpluginInstance } from 'unplugin'
 import { ViteNodeRunner } from 'vite-node/client'
 import { ViteNodeServer } from 'vite-node/server'
 import { installSourcemapsSupport } from 'vite-node/source-map'
-import { transformMacros } from './core/index.ts'
+import {
+  transformMacros,
+  VIRTUAL_ID_PATTERN,
+  VIRTUAL_ID_PREFIX,
+} from './core/index.ts'
 import {
   resolveOptions,
   type Options,
@@ -47,6 +51,16 @@ const plugin: UnpluginInstance<Options | undefined, false> = createUnplugin<
   let runner: ViteNodeRunner | undefined
 
   const deps: Map<string, Set<string>> = new Map()
+
+  /**
+   * The registry of virtual modules that hold deduplicated macro results,
+   * mapping a content hash to the module code.
+   * Entries are content-addressed, so they can be safely shared
+   * across plugin instances.
+   */
+  const virtualModules = options.virtualModules
+    ? new Map<string, string>()
+    : undefined
 
   let initPromise: Promise<void> | undefined
   function init() {
@@ -99,6 +113,27 @@ const plugin: UnpluginInstance<Options | undefined, false> = createUnplugin<
       }
     },
 
+    ...(virtualModules && {
+      resolveId: {
+        filter: { id: VIRTUAL_ID_PATTERN },
+        handler: (id) => id,
+      },
+
+      load: {
+        filter: { id: VIRTUAL_ID_PATTERN },
+        handler(id) {
+          const code = virtualModules.get(id.slice(VIRTUAL_ID_PREFIX.length))
+          if (code == null) {
+            throw new Error(
+              `Macro virtual module ${id} is not found. ` +
+                `It may be caused by a stale bundler cache from a previous build; try clearing the cache.`,
+            )
+          }
+          return code
+        },
+      },
+    }),
+
     transform: {
       filter: { id: { include, exclude } },
       handler: withMagicString(function (s, id) {
@@ -108,6 +143,7 @@ const plugin: UnpluginInstance<Options | undefined, false> = createUnplugin<
           getRunner,
           deps,
           attrs: options.attrs,
+          virtualModules,
           unpluginContext: this,
         })
       }),
@@ -131,7 +167,7 @@ const plugin: UnpluginInstance<Options | undefined, false> = createUnplugin<
 
         const affected = new Set<ModuleNode>()
 
-        for (const [id, macrosIds] of deps.entries()) {
+        for (const [id, macrosIds] of deps) {
           if (!macrosIds.has(file)) continue
           server.moduleGraph
             .getModulesByFile(id)

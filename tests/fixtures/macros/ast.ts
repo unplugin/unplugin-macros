@@ -8,12 +8,13 @@ export function getAst(this: MacroContext): {
   programType: string
 } {
   const { call, program } = this.ast
+  const before = this.source.slice(0, call.start)
   return {
-    line: call.loc!.start.line,
-    column: call.loc!.start.column,
+    line: before.split('\n').length,
+    column: call.start - (before.lastIndexOf('\n') + 1),
     calleeName:
       call.callee.type === 'Identifier' ? call.callee.name : '<other>',
-    callSource: this.source.slice(call.start!, call.end!),
+    callSource: this.source.slice(call.start, call.end),
     programType: program.type,
   }
 }

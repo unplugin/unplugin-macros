@@ -1,29 +1,38 @@
+import { hash } from 'node:crypto'
 import { isBuiltin } from 'node:module'
-import {
-  attachScopes,
-  babelParse,
-  getLang,
-  isLiteralType,
-  isReferenced,
-  isTypeOf,
-  resolveIdentifier,
-  resolveLiteral,
-  resolveObjectKey,
-  TS_NODE_TYPES,
-  walkAST,
-  walkASTAsync,
-  walkImportDeclaration,
-  type ImportBinding,
-  type WithScope,
-} from 'ast-kit'
 import { MagicStringAST } from 'magic-string-ast'
-import type * as t from '@babel/types'
+import { analyze, type Symbol as AnalyzerSymbol } from 'yuku-analyzer'
+import { is, literalValue, nameOf, walkAsync } from 'yuku-ast'
+import { resolveMemberChain } from './utils.ts'
 import type { RolldownString } from 'rolldown-string'
 import type { UnpluginBuildContext, UnpluginContext } from 'unplugin'
 import type { ViteNodeRunner } from 'vite-node/client'
+import type {
+  CallExpression,
+  ExportAllDeclaration,
+  ExportNamedDeclaration,
+  Expression,
+  ImportAttribute,
+  Node,
+  Program,
+  StringLiteral,
+  Super,
+} from 'yuku-parser'
 
 export * from './define.ts'
 export * from './options.ts'
+
+/**
+ * The TypeScript-only nodes that still wrap a runtime expression, so the walk
+ * has to descend into them. Every other `TS*` node is pure type syntax.
+ */
+const TS_EXPRESSION_TYPES: ReadonlySet<string> = new Set([
+  'TSAsExpression',
+  'TSInstantiationExpression',
+  'TSNonNullExpression',
+  'TSSatisfiesExpression',
+  'TSTypeAssertion',
+])
 
 /**
  * AST handles for a macro invocation.
@@ -36,12 +45,15 @@ export interface MacroAst {
    *   wrapping `AwaitExpression`.
    * - For tagged template macros (`` fn`...` ``) this is a synthesized
    *   `CallExpression` whose `arguments` is `[quasi]` and whose
-   *   `.loc`/`.start`/`.end` match the original `TaggedTemplateExpression`.
+   *   `.start`/`.end` match the original `TaggedTemplateExpression`.
    */
-  call: t.CallExpression
+  call: CallExpression
   /** The `Program` AST of the file being transformed. */
-  program: t.Program
+  program: Program
 }
+
+export const VIRTUAL_ID_PREFIX = 'virtual:unplugin-macros/'
+export const VIRTUAL_ID_PATTERN: RegExp = /^virtual:unplugin-macros\//
 
 /**
  * Represents the context object passed to macros.
@@ -53,9 +65,9 @@ export interface MacroContext {
   /**
    * AST handles for this macro invocation and its enclosing file.
    *
-   * Use `ast.call` to inspect the call expression (e.g. `ast.call.loc!.start.line`
-   * for the line number, `source.slice(ast.call.start!, ast.call.end!)` for the
-   * raw call source). Use `ast.program` to walk over the rest of the file.
+   * Use `ast.call` to inspect the call expression (e.g.
+   * `source.slice(ast.call.start, ast.call.end)` for the raw call source).
+   * Use `ast.program` to walk over the rest of the file.
    */
   ast: MacroAst
   /**
@@ -66,31 +78,44 @@ export interface MacroContext {
   unpluginContext: UnpluginBuildContext & UnpluginContext
 }
 
+/**
+ * The macro module a local binding was imported from.
+ */
+export interface MacroBinding {
+  /** The module specifier the macro is imported from. */
+  source: string
+  /** The imported export name, or `'*'` for a namespace import. */
+  imported: string
+}
+
 export interface MacroBase {
-  node: t.Node
+  node: Node
   id: string[]
+  binding: MacroBinding
   isAwait: boolean
-  parent?: t.Node | null
+  parent?: Node | null
 }
 export interface CallMacro extends MacroBase {
   type: 'call'
-  args: t.Node[]
+  args: Node[]
 }
 export interface IdentifierMacro extends MacroBase {
   type: 'identifier'
 }
 export type Macro = CallMacro | IdentifierMacro
 type MacroExportDeclaration = (
-  | t.ExportNamedDeclaration
-  | t.ExportAllDeclaration
-) & { source: t.StringLiteral }
+  ExportNamedDeclaration | ExportAllDeclaration
+) & {
+  source: StringLiteral
+}
 
-export interface TransformOptions {
+export interface TransformContext {
   id: string
   s: RolldownString
   unpluginContext: UnpluginBuildContext & UnpluginContext
   deps: Map<string, Set<string>>
   attrs: Record<string, string>
+  virtualModules?: Map<string, string>
   getRunner: () => Promise<ViteNodeRunner>
 }
 
@@ -98,27 +123,29 @@ export interface TransformOptions {
  * Transforms macros in the given source code.
  */
 export async function transformMacros(
-  options: TransformOptions,
+  context: TransformContext,
 ): Promise<void> {
-  const { id, unpluginContext, deps, attrs, getRunner } = options
+  const { id, unpluginContext, deps, attrs, getRunner } = context
 
-  const source = options.s.toString()
-  const program = babelParse(source, getLang(id))
-  const s = new MagicStringAST(options.s as any)
-  let generatedExportIndex = 0
+  const source = context.s.toString()
+  const mod = analyze(source, { path: id })
+  const program = mod.ast
+  const s = new MagicStringAST(context.s as any)
 
-  const imports = new Map(Object.entries(recordImports()))
+  const imports = recordImports()
   const macroExports = program.body.filter(isMacroExportDeclaration)
   const macros = collectMacros()
-  const skip = new Set<Macro>()
 
   if (!macros.length && !macroExports.length) {
     deps.delete(id)
     return
   }
 
+  const skip = new Set<Macro>()
+  const virtualImports = new Map<string, string>()
   const runner = await getRunner()
   deps.set(id, new Set())
+  let generatedExportIndex = 0
   let needWrap = false
 
   for (const declaration of macroExports) {
@@ -132,12 +159,14 @@ export async function transformMacros(
     }
 
     const result = await executeMacro(macro, runner, id)
-    const stringified = stringifyValue(result)
+    const stringified = context.virtualModules
+      ? importValue(result)
+      : stringifyValue(result)
 
     // Handle shorthand property in object literals: { foo } -> { foo: value }
     const { parent } = macro
     if (
-      parent?.type === 'ObjectProperty' &&
+      parent?.type === 'Property' &&
       parent.shorthand &&
       macro.type === 'identifier' &&
       parent.key.type === 'Identifier'
@@ -152,94 +181,115 @@ export async function transformMacros(
     s.prepend(`function $macros$wrap(value) { return value }\n`)
   }
 
+  function importValue(value: unknown): string {
+    // `$macros$wrap` must be defined inside the self-contained virtual
+    // module, not in the host module, so track it separately here.
+    const outerNeedWrap = needWrap
+    needWrap = false
+    const stringified = stringifyValue(value)
+    const wrap = needWrap
+      ? `function $macros$wrap(value) { return value }\n`
+      : ''
+    needWrap = outerNeedWrap
+
+    const key = hash('sha256', stringified).slice(0, 16)
+    let local = virtualImports.get(key)
+    if (!local) {
+      local = `_macro_${key}`
+      virtualImports.set(key, local)
+      context.virtualModules?.set(key, `${wrap}export default ${stringified}\n`)
+      s.prepend(
+        `import ${local} from ${JSON.stringify(VIRTUAL_ID_PREFIX + key)};\n`,
+      )
+    }
+    return local
+  }
+
+  /**
+   * Resolves an expression to the macro it references, or `undefined` when its
+   * root identifier is not a macro import. The analyzer resolves the
+   * identifier against its scope, so shadowed bindings and identifiers in
+   * non-reference positions (property keys, declarations) never match.
+   */
+  function resolveMacro(
+    node: Expression | Super,
+  ): { id: string[]; binding: MacroBinding } | undefined {
+    const chain = resolveMemberChain(node)
+    if (!chain) return
+    const symbol = mod.referenceOf(chain.root)?.symbol
+    if (!symbol) return
+    const binding = imports.get(symbol)
+    if (!binding) return
+    return { id: chain.id, binding }
+  }
+
   function collectMacros() {
     const macros: Macro[] = []
-    let scope = attachScopes(program, 'scope')
-    const parentStack: t.Node[] = []
-    const skip = new Set<t.Node>()
+    const skippedNodes = new Set<Node>()
 
-    walkAST<WithScope<t.Node>>(program, {
-      enter(node, parent) {
-        if (skip.has(node)) {
-          return this.skip()
+    mod.walk({
+      enter(node, ctx) {
+        if (skippedNodes.has(node)) {
+          return ctx.skip()
         }
 
-        parent && parentStack.push(parent)
-        if (node.scope) scope = node.scope
-
-        if (
-          node.type.startsWith('TS') &&
-          !TS_NODE_TYPES.includes(node.type as any)
-        ) {
-          return this.skip()
+        if (node.type.startsWith('TS') && !TS_EXPRESSION_TYPES.has(node.type)) {
+          return ctx.skip()
         }
 
+        const { parent } = ctx
         const isAwait = parent?.type === 'AwaitExpression'
 
-        if (node.type === 'TaggedTemplateExpression') {
-          node = {
-            ...(node as any),
-            type: 'CallExpression',
-            callee: node.tag,
-            arguments: [node.quasi],
-          }
-        }
+        // Treat `` fn`...` `` as `fn(quasi)`, keeping the original span.
+        const call: CallExpression | undefined =
+          node.type === 'CallExpression'
+            ? node
+            : node.type === 'TaggedTemplateExpression'
+              ? {
+                  ...node,
+                  type: 'CallExpression',
+                  callee: node.tag,
+                  arguments: [node.quasi],
+                  optional: false,
+                }
+              : undefined
 
-        if (
-          node.type === 'CallExpression' &&
-          isTypeOf(node.callee, ['Identifier', 'MemberExpression'])
-        ) {
-          let id: string[]
-          try {
-            id = resolveIdentifier(node.callee)
-          } catch {
-            return
-          }
-          if (!imports.has(id[0]) || scope.contains(id[0])) return
+        if (call) {
+          if (!is.oneOf(call.callee, ['Identifier', 'MemberExpression'])) return
 
-          skip.add(node.callee)
+          const resolved = resolveMacro(call.callee)
+          if (!resolved) return
+
+          // Skip the callee only once the call is known to be a macro.
+          skippedNodes.add(call.callee)
 
           macros.push({
             type: 'call',
-            node: isAwait ? parent : node,
-            id,
+            node: isAwait ? parent! : call,
+            id: resolved.id,
+            binding: resolved.binding,
             // eslint-disable-next-line baseline-js/use-baseline
-            args: node.arguments,
+            args: call.arguments,
             isAwait,
             parent,
           })
-        } else if (
-          isTypeOf(node, ['Identifier', 'MemberExpression']) &&
-          (!parent || isReferenced(node, parent, parentStack.at(-2)))
-        ) {
-          let id: string[]
-          try {
-            id = resolveIdentifier(node)
-          } catch {
-            return
-          }
-          if (!imports.has(id[0]) || scope.contains(id[0])) return
+        } else if (is.oneOf(node, ['Identifier', 'MemberExpression'])) {
+          const resolved = resolveMacro(node)
+          if (!resolved) return
           if (parent?.type === 'ExportSpecifier') {
             throw new Error('Exporting macros is not allowed.')
           }
 
           macros.push({
             type: 'identifier',
-            node: isAwait ? parent : node,
-            id,
+            node: isAwait ? parent! : node,
+            id: resolved.id,
+            binding: resolved.binding,
             isAwait,
             parent,
           })
-          this.skip()
+          ctx.skip()
         }
-      },
-      leave(node) {
-        if (skip.has(node)) {
-          return this.skip()
-        }
-
-        if (node.scope) scope = scope.parent!
-        parentStack.pop()
       },
     })
 
@@ -247,7 +297,7 @@ export async function transformMacros(
   }
 
   function isMacroExportDeclaration(
-    node: t.Node | undefined,
+    node: Node | undefined,
   ): node is MacroExportDeclaration {
     if (!node) return false
     if (
@@ -299,39 +349,29 @@ export async function transformMacros(
 
     if (declaration.type === 'ExportNamedDeclaration') {
       for (const specifier of declaration.specifiers) {
-        if (specifier.type === 'ExportNamespaceSpecifier') {
-          const exportName = source.slice(
-            specifier.exported.start!,
-            specifier.exported.end!,
-          )
-          exportValue(
-            exportName,
-            Object.fromEntries(
-              Object.entries(exported).filter(
-                ([name]) => name !== '__esModule',
-              ),
-            ),
-          )
-          continue
-        }
-
-        if (specifier.type !== 'ExportSpecifier') continue
-
-        const sourceLocal = specifier.local as t.Identifier | t.StringLiteral
-        const sourceName =
-          sourceLocal.type === 'StringLiteral'
-            ? sourceLocal.value
-            : sourceLocal.name
+        const sourceName = nameOf(specifier.local)
         if (!(sourceName in exported)) {
           throw new Error(`Macro ${sourceName} is not existed.`)
         }
 
         const exportName = source.slice(
-          specifier.exported.start!,
-          specifier.exported.end!,
+          specifier.exported.start,
+          specifier.exported.end,
         )
         exportValue(exportName, exported[sourceName])
       }
+    } else if (declaration.exported) {
+      // `export * as ns from '...'`
+      const exportName = source.slice(
+        declaration.exported.start,
+        declaration.exported.end,
+      )
+      exportValue(
+        exportName,
+        Object.fromEntries(
+          Object.entries(exported).filter(([name]) => name !== '__esModule'),
+        ),
+      )
     } else {
       const names = Object.keys(exported).filter(
         (name) => name !== 'default' && name !== '__esModule',
@@ -362,13 +402,13 @@ export async function transformMacros(
     id: string,
   ): Promise<unknown> {
     const {
-      id: [local, ...keys],
+      id: [local],
+      binding,
       isAwait,
     } = macro
-    const binding = imports.get(local)!
     let exported: any = await resolveMacroModule(binding.source, runner, id)
 
-    const props = [...keys]
+    const props = macro.id.slice(1)
     if (binding.imported !== '*') {
       if (!(binding.imported in exported)) {
         throw new Error(`Macro ${local} is not existed.`)
@@ -381,10 +421,10 @@ export async function transformMacros(
 
     let result: any
     if (macro.type === 'call') {
-      const callNode: t.CallExpression =
+      const callNode: CallExpression =
         macro.node.type === 'AwaitExpression'
-          ? (macro.node.argument as t.CallExpression)
-          : (macro.node as t.CallExpression)
+          ? (macro.node.argument as CallExpression)
+          : (macro.node as CallExpression)
 
       const ctx: MacroContext = {
         id,
@@ -399,22 +439,22 @@ export async function transformMacros(
 
       const args: any[] = []
       for (const arg of macro.args) {
-        if (isLiteralType(arg)) {
-          args.push(resolveLiteral(arg))
+        if (is.Literal(arg)) {
+          args.push(literalValue(arg))
           continue
         }
 
-        const code = source.slice(arg.start!, arg.end!)
-        const s = new MagicStringAST(code, { offset: -arg.start! })
+        const code = source.slice(arg.start, arg.end)
+        const s = new MagicStringAST(code, { offset: -arg.start })
 
-        await walkASTAsync(arg, {
-          async enter(node) {
+        await walkAsync(arg, {
+          async enter(node, ctx) {
             const subMacro = macros.find((macro) => macro.node === node)
             if (subMacro) {
               skip.add(subMacro)
               const result = await executeMacro(subMacro, runner, id)
               s.overwriteNode(node, stringifyValue(result))
-              this.skip()
+              ctx.skip()
             }
           },
         })
@@ -440,15 +480,35 @@ export async function transformMacros(
   }
 
   function recordImports() {
-    const imports: Record<string, ImportBinding> = {}
+    const imports = new Map<AnalyzerSymbol, MacroBinding>()
     for (const node of program.body) {
       if (
-        node.type === 'ImportDeclaration' &&
-        node.importKind !== 'type' &&
-        checkImportAttributes(attrs, node.attributes)
+        node.type !== 'ImportDeclaration' ||
+        node.importKind === 'type' ||
+        !checkImportAttributes(attrs, node.attributes)
       ) {
-        s.removeNode(node)
-        walkImportDeclaration(imports, node)
+        continue
+      }
+
+      s.removeNode(node)
+      for (const specifier of node.specifiers) {
+        if (
+          specifier.type === 'ImportSpecifier' &&
+          specifier.importKind === 'type'
+        ) {
+          continue
+        }
+
+        const symbol = mod.symbolOf(specifier.local)
+        if (!symbol) continue
+
+        const imported =
+          specifier.type === 'ImportDefaultSpecifier'
+            ? 'default'
+            : specifier.type === 'ImportNamespaceSpecifier'
+              ? '*'
+              : nameOf(specifier.imported)
+        imports.set(symbol, { source: node.source.value, imported })
       }
     }
     return imports
@@ -491,11 +551,10 @@ export async function transformMacros(
 
 function checkImportAttributes(
   expected: Record<string, string>,
-  actual?: t.ImportAttribute[] | null,
+  actual: ImportAttribute[],
 ) {
-  if (!actual) return false
   const actualAttrs = Object.fromEntries(
-    actual.map((attr) => [resolveObjectKey(attr), attr.value.value]),
+    actual.map((attr) => [nameOf(attr.key), attr.value.value]),
   )
   return Object.entries(expected).every(
     ([key, expectedValue]) => actualAttrs[key] === expectedValue,
