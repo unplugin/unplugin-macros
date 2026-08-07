@@ -1,3 +1,4 @@
+import { arg } from './macros/args' with { type: 'macro' }
 import { getRandom } from './macros/rand' with { type: 'macro' }
 
 function defineRoute(handler) {
@@ -12,3 +13,5 @@ function defineRoute(handler) {
 const route = defineRoute(() => {
   return getRandom()
 }).meta({ seed: getRandom() })
+
+arg({ foo: 'foo' }).foo.toString()

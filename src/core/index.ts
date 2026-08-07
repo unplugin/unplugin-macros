@@ -22,6 +22,14 @@ import type {
 export * from './define.ts'
 export * from './options.ts'
 
+/** Node types whose children are a statement list, where `;` is a no-op. */
+const STATEMENT_LIST_TYPES: ReadonlySet<string> = new Set([
+  'BlockStatement',
+  'Program',
+  'StaticBlock',
+  'SwitchCase',
+])
+
 /**
  * The TypeScript-only nodes that still wrap a runtime expression, so the walk
  * has to descend into them. Every other `TS*` node is pure type syntax.
@@ -163,18 +171,7 @@ export async function transformMacros(
       ? importValue(result)
       : stringifyValue(result)
 
-    // Handle shorthand property in object literals: { foo } -> { foo: value }
-    const { parent } = macro
-    if (
-      parent?.type === 'Property' &&
-      parent.shorthand &&
-      macro.type === 'identifier' &&
-      parent.key.type === 'Identifier'
-    ) {
-      s.overwriteNode(macro.node, `${parent.key.name}: ${stringified}`)
-    } else {
-      s.overwriteNode(macro.node, stringified)
-    }
+    overwriteMacro(s, macro, parenthesize(macro, stringified))
   }
 
   if (needWrap) {
@@ -203,6 +200,34 @@ export async function transformMacros(
       )
     }
     return local
+  }
+
+  /**
+   * An object literal at the head of an expression statement parses as a
+   * block, so a macro inlined there has to be parenthesized: `macro().foo`
+   * -> `({ ... }).foo`.
+   */
+  function parenthesize(macro: Macro, value: string): string {
+    if (!value.startsWith('{')) return value
+
+    // Walk up while the ancestor still begins at the macro, i.e. while the
+    // macro is the leftmost token of the enclosing expression.
+    let node = macro.parent
+    while (node && node.start === macro.node.start) {
+      if (node.type === 'ExpressionStatement') {
+        // The added `(` can be swallowed by ASI as a call on the previous
+        // line, so guard it with a `;`. That is only safe where an empty
+        // statement is — a statement list — and it is also the only place
+        // the hazard exists: every other statement position is preceded by
+        // a token that cannot continue an expression.
+        const parent = mod.parentOf(node)
+        return STATEMENT_LIST_TYPES.has(parent?.type as string)
+          ? `;(${value})`
+          : `(${value})`
+      }
+      node = mod.parentOf(node)
+    }
+    return value
   }
 
   /**
@@ -453,7 +478,7 @@ export async function transformMacros(
             if (subMacro) {
               skip.add(subMacro)
               const result = await executeMacro(subMacro, runner, id)
-              s.overwriteNode(node, stringifyValue(result))
+              overwriteMacro(s, subMacro, stringifyValue(result))
               ctx.skip()
             }
           },
@@ -492,13 +517,6 @@ export async function transformMacros(
 
       s.removeNode(node)
       for (const specifier of node.specifiers) {
-        if (
-          specifier.type === 'ImportSpecifier' &&
-          specifier.importKind === 'type'
-        ) {
-          continue
-        }
-
         const symbol = mod.symbolOf(specifier.local)
         if (!symbol) continue
 
@@ -546,6 +564,25 @@ export async function transformMacros(
       return `new Date(${(value as Date).getTime()})`
     }
     return JSON.stringify(value)
+  }
+}
+
+/**
+ * Writes a macro's value over the node it came from. A shorthand property has
+ * to keep its key — `{ foo }` -> `{ foo: value }` — or the object literal
+ * becomes invalid.
+ */
+function overwriteMacro(s: MagicStringAST, macro: Macro, value: string) {
+  const { parent } = macro
+  if (
+    parent?.type === 'Property' &&
+    parent.shorthand &&
+    macro.type === 'identifier' &&
+    parent.key.type === 'Identifier'
+  ) {
+    s.overwriteNode(macro.node, `${parent.key.name}: ${value}`)
+  } else {
+    s.overwriteNode(macro.node, value)
   }
 }
 
