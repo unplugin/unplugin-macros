@@ -1,5 +1,5 @@
-import { arg } from './macros/args' with { type: 'macro' }
-import { getRandom } from './macros/rand' with { type: 'macro' }
+import { arg } from './macros/args.ts' with { type: 'macro' }
+import { getRandom } from './macros/rand.js' with { type: 'macro' }
 
 function defineRoute(handler) {
   return {

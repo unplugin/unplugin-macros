@@ -1,3 +1,3 @@
-import { getCtx } from './macros/ctx' with { type: 'macro' }
+import { getCtx } from './macros/ctx.ts' with { type: 'macro' }
 
 getCtx() === 'ctx.js'

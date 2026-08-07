@@ -1,3 +1,3 @@
-import { getAst } from './macros/ast' with { type: 'macro' }
+import { getAst } from './macros/ast.ts' with { type: 'macro' }
 
 export const ast = getAst()

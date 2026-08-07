@@ -4,9 +4,9 @@ import { MagicStringAST } from 'magic-string-ast'
 import { analyze, type Symbol as AnalyzerSymbol } from 'yuku-analyzer'
 import { is, literalValue, nameOf, walkAsync } from 'yuku-ast'
 import { resolveMemberChain } from './utils.ts'
+import type { MacroRunner } from '../runner/index.ts'
 import type { RolldownString } from 'rolldown-string'
 import type { UnpluginBuildContext, UnpluginContext } from 'unplugin'
-import type { ViteNodeRunner } from 'vite-node/client'
 import type {
   CallExpression,
   ExportAllDeclaration,
@@ -18,9 +18,6 @@ import type {
   StringLiteral,
   Super,
 } from 'yuku-parser'
-
-export * from './define.ts'
-export * from './options.ts'
 
 /** Node types whose children are a statement list, where `;` is a no-op. */
 const STATEMENT_LIST_TYPES: ReadonlySet<string> = new Set([
@@ -124,7 +121,7 @@ export interface TransformContext {
   deps: Map<string, Set<string>>
   attrs: Record<string, string>
   virtualModules?: Map<string, string>
-  getRunner: () => Promise<ViteNodeRunner>
+  getRunner: () => Promise<MacroRunner>
 }
 
 /**
@@ -340,21 +337,21 @@ export async function transformMacros(
 
   async function resolveMacroModule(
     source: string,
-    runner: ViteNodeRunner,
+    runner: MacroRunner,
     id: string,
   ): Promise<Record<string, unknown>> {
-    const [, resolved] = await runner.resolveUrl(source, id)
+    const resolved = await runner.resolve(source, id)
     deps.get(id)!.add(resolved)
 
     const module = isBuiltin(resolved)
       ? await import(resolved)
-      : await runner.executeFile(resolved)
+      : await runner.import(resolved)
     return module as Record<string, unknown>
   }
 
   async function executeMacroExport(
     declaration: MacroExportDeclaration,
-    runner: ViteNodeRunner,
+    runner: MacroRunner,
     id: string,
   ): Promise<string> {
     const exported = await resolveMacroModule(
@@ -423,7 +420,7 @@ export async function transformMacros(
 
   async function executeMacro(
     macro: Macro,
-    runner: ViteNodeRunner,
+    runner: MacroRunner,
     id: string,
   ): Promise<unknown> {
     const {

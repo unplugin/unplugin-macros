@@ -1,4 +1,4 @@
-import { arg } from './macros/args' with { type: 'macro' }
+import { arg } from './macros/args.ts' with { type: 'macro' }
 
 arg(0) === 0
 arg('1') === '1'

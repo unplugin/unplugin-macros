@@ -53,12 +53,19 @@
     "release": "bumpp",
     "prepublishOnly": "pnpm run build"
   },
+  "peerDependencies": {
+    "unrun": "^0.3.1"
+  },
+  "peerDependenciesMeta": {
+    "unrun": {
+      "optional": true
+    }
+  },
   "dependencies": {
+    "import-without-cache": "^0.4.0",
     "magic-string-ast": "^2.1.1",
     "rolldown-string": "^0.3.1",
     "unplugin": "^3.3.0",
-    "vite": "^8.0.12",
-    "vite-node": "^6.0.0",
     "yuku-analyzer": "^0.8.4",
     "yuku-ast": "^0.8.4",
     "yuku-parser": "^0.8.4"
@@ -77,6 +84,8 @@
     "tsdown": "^0.22.14",
     "tsdown-preset-sxzz": "^0.7.0",
     "typescript": "^6.0.3",
+    "unrun": "^0.3.1",
+    "vite": "^8.0.12",
     "vitest": "^4.1.10"
   },
   "prettier": "@sxzz/prettier-config"

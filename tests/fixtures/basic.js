@@ -1,6 +1,6 @@
-import { getRandom } from './macros/rand' with { type: 'macro' }
-import { inc } from './macros/inc' with { type: 'macro' }
-import { foo, _undefined } from './macros/var' with { type: 'macro' }
+import { getRandom } from './macros/rand.js' with { type: 'macro' }
+import { inc } from './macros/inc.js' with { type: 'macro' }
+import { foo, _undefined } from './macros/var.ts' with { type: 'macro' }
 
 getRandom() === 0.5
 inc() === 1

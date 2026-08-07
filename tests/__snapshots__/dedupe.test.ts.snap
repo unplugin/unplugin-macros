@@ -10,7 +10,7 @@ const a2 = _macro_831c446d122a4b37;
 const b = _macro_831c446d122a4b37;
 
 function $macros$wrap(value) { return value }
-var _macro_db9143032c5e2e6f = $macros$wrap(() => "fn-value");
+var _macro_4cbe142ca217ca08 = $macros$wrap(() => 'fn-value');
 
 var _macro_1172e626a0391c41 = { "marker": "args-marker", "items": [0, 1] };
 
@@ -19,7 +19,7 @@ var _macro_c7f98bd1374b2a60 = "async-value";
 const c = { config: _macro_831c446d122a4b37 };
 const d = _macro_c7f98bd1374b2a60;
 const e = _macro_1172e626a0391c41;
-const f = _macro_db9143032c5e2e6f;
+const f = _macro_4cbe142ca217ca08;
 
 const all = [a, a2, b, c, d, e, f];
 const shared = a === b;

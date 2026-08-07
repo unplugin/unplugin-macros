@@ -3,7 +3,7 @@ import {
   getArgs,
   getAsync,
   getFn,
-} from './macro' with { type: 'macro' }
+} from './macro.ts' with { type: 'macro' }
 
 export const c = { config }
 export const d = await getAsync()

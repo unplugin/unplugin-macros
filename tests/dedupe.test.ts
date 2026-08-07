@@ -1,7 +1,7 @@
 import path from 'node:path'
 import { rollupBuild } from '@sxzz/test-utils'
 import { describe, expect, test } from 'vitest'
-import { resolveOptions } from '../src/core/index.ts'
+import { resolveOptions } from '../src/core/options.ts'
 import Macros from '../src/rollup.ts'
 
 const entry = path.resolve(import.meta.dirname, 'fixtures/dedupe/entry.js')

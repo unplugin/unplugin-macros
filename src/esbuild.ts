@@ -4,7 +4,7 @@
  * @module
  */
 
-import unplugin from './index.ts'
+import { Macros } from './index.ts'
 
 /**
  * Esbuild plugin
@@ -19,6 +19,6 @@ import unplugin from './index.ts'
  * })
  * ```
  */
-const esbuild = unplugin.esbuild as typeof unplugin.esbuild
+const esbuild = Macros.esbuild as typeof Macros.esbuild
 export default esbuild
 export { esbuild as 'module.exports' }

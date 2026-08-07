@@ -4,7 +4,7 @@
  * @module
  */
 
-import unplugin from './index.ts'
+import { Macros } from './index.ts'
 
 /**
  * Rspack plugin
@@ -17,6 +17,6 @@ import unplugin from './index.ts'
  * }
  * ```
  */
-const rspack = unplugin.rspack as typeof unplugin.rspack
+const rspack = Macros.rspack as typeof Macros.rspack
 export default rspack
 export { rspack as 'module.exports' }

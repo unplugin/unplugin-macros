@@ -4,7 +4,7 @@
  * @module
  */
 
-import unplugin from './index.ts'
+import { Macros } from './index.ts'
 
 /**
  * Webpack plugin
@@ -17,6 +17,6 @@ import unplugin from './index.ts'
  * }
  * ```
  */
-const webpack = unplugin.webpack as typeof unplugin.webpack
+const webpack = Macros.webpack as typeof Macros.webpack
 export default webpack
 export { webpack as 'module.exports' }

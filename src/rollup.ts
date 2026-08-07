@@ -4,7 +4,7 @@
  * @module
  */
 
-import unplugin from './index.ts'
+import { Macros } from './index.ts'
 
 /**
  * Rollup plugin
@@ -19,6 +19,6 @@ import unplugin from './index.ts'
  * }
  * ```
  */
-const rollup = unplugin.rollup as typeof unplugin.rollup
+const rollup = Macros.rollup as typeof Macros.rollup
 export default rollup
 export { rollup as 'module.exports' }

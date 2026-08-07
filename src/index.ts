@@ -5,178 +5,109 @@
 
 import { withMagicString } from 'rolldown-string'
 import { createUnplugin, type UnpluginInstance } from 'unplugin'
-import { ViteNodeRunner } from 'vite-node/client'
-import { ViteNodeServer } from 'vite-node/server'
-import { installSourcemapsSupport } from 'vite-node/source-map'
 import {
   transformMacros,
   VIRTUAL_ID_PATTERN,
   VIRTUAL_ID_PREFIX,
 } from './core/index.ts'
-import {
-  resolveOptions,
-  type Options,
-  type OptionsResolved,
-} from './core/options.ts'
-import type { ModuleNode, ViteDevServer } from 'vite'
+import { resolveOptions, type Options } from './core/options.ts'
+import type { MacroRunner } from './runner/index.ts'
+import type { ModuleNode } from 'vite'
 
-export type { MacroContext, Options } from './core/index.ts'
-
-async function initServer(options: OptionsResolved) {
-  const { createServer } = await import('vite')
-  const server = await createServer({
-    ...options.viteConfig,
-    optimizeDeps: {
-      include: [],
-      noDiscovery: true,
-    },
-  })
-  await server.pluginContainer.buildStart({})
-  return server
-}
+export * from './core/define.ts'
+export * from './core/index.ts'
+export * from './core/options.ts'
 
 /**
  * The main unplugin instance.
  */
-const plugin: UnpluginInstance<Options | undefined, false> = createUnplugin<
-  Options | undefined,
-  false
->((rawOptions = {}) => {
-  const options = resolveOptions(rawOptions)
-  const { include, exclude } = options
+export const Macros: UnpluginInstance<Options | undefined, false> =
+  createUnplugin<Options | undefined, false>((rawOptions = {}) => {
+    const options = resolveOptions(rawOptions)
+    const { include, exclude, runner } = options
 
-  let isBuiltinServer: boolean
-  let server: ViteDevServer
-  let node: ViteNodeServer
-  let runner: ViteNodeRunner | undefined
+    const deps: Map<string, Set<string>> = new Map()
 
-  const deps: Map<string, Set<string>> = new Map()
+    /**
+     * The registry of virtual modules that hold deduplicated macro results,
+     * mapping a content hash to the module code.
+     * Entries are content-addressed, so they can be safely shared
+     * across plugin instances.
+     */
+    const virtualModules = options.virtualModules
+      ? new Map<string, string>()
+      : undefined
 
-  /**
-   * The registry of virtual modules that hold deduplicated macro results,
-   * mapping a content hash to the module code.
-   * Entries are content-addressed, so they can be safely shared
-   * across plugin instances.
-   */
-  const virtualModules = options.virtualModules
-    ? new Map<string, string>()
-    : undefined
+    let initPromise: Promise<MacroRunner> | undefined
+    function getRunner() {
+      return (initPromise ??= Promise.resolve(runner.init?.()).then(
+        () => runner,
+      ))
+    }
 
-  let initPromise: Promise<void> | undefined
-  function init() {
-    if (initPromise) return initPromise
-    return (initPromise = (async () => {
-      isBuiltinServer = !options.viteServer
-      server = options.viteServer || (await initServer(options))
-      initRunner()
-    })())
-  }
+    return {
+      name: 'unplugin-macros',
+      enforce: options.enforce,
 
-  function initRunner() {
-    // create vite-node server
-    node = new ViteNodeServer(server)
-
-    // fixes stacktraces in Errors
-    installSourcemapsSupport({
-      getSourceMap: (source) => node.getSourceMap(source),
-    })
-
-    // create vite-node runner
-    runner = new ViteNodeRunner({
-      root: server.config.root,
-      base: server.config.base,
-      // when having the server and runner in a different context,
-      // you will need to handle the communication between them
-      // and pass to this function
-      fetchModule(id) {
-        return node.fetchModule(id)
-      },
-      resolveId(id, importer) {
-        return node.resolveId(id, importer)
-      },
-    })
-  }
-
-  async function getRunner() {
-    await init()
-    return runner!
-  }
-
-  return {
-    name: 'unplugin-macros',
-    enforce: options.enforce,
-
-    buildEnd() {
-      if (isBuiltinServer && server) {
-        // close the built-in vite server
-        return server.close()
-      }
-    },
-
-    ...(virtualModules && {
-      resolveId: {
-        filter: { id: VIRTUAL_ID_PATTERN },
-        handler: (id) => id,
+      async buildEnd() {
+        await runner.close?.()
       },
 
-      load: {
-        filter: { id: VIRTUAL_ID_PATTERN },
-        handler(id) {
-          const code = virtualModules.get(id.slice(VIRTUAL_ID_PREFIX.length))
-          if (code == null) {
-            throw new Error(
-              `Macro virtual module ${id} is not found. ` +
-                `It may be caused by a stale bundler cache from a previous build; try clearing the cache.`,
-            )
+      ...(virtualModules && {
+        resolveId: {
+          filter: { id: VIRTUAL_ID_PATTERN },
+          handler: (id) => id,
+        },
+
+        load: {
+          filter: { id: VIRTUAL_ID_PATTERN },
+          handler(id) {
+            const code = virtualModules.get(id.slice(VIRTUAL_ID_PREFIX.length))
+            if (code == null) {
+              throw new Error(
+                `Macro virtual module ${id} is not found. ` +
+                  `It may be caused by a stale bundler cache from a previous build; try clearing the cache.`,
+              )
+            }
+            return code
+          },
+        },
+      }),
+
+      transform: {
+        filter: { id: { include, exclude } },
+        handler: withMagicString(function (s, id) {
+          return transformMacros({
+            s,
+            id,
+            getRunner,
+            deps,
+            attrs: options.attrs,
+            virtualModules,
+            unpluginContext: this,
+          })
+        }),
+      },
+
+      vite: {
+        async handleHotUpdate({ file, server, modules }) {
+          const invalidated = await runner.invalidate?.(file)
+          if (!invalidated) return
+
+          const stale = [...invalidated]
+          if (!stale.length) return
+
+          const affected = new Set<ModuleNode>()
+
+          for (const [id, macrosIds] of deps) {
+            if (stale.every((macro) => !macrosIds.has(macro))) continue
+            server.moduleGraph
+              .getModulesByFile(id)
+              ?.forEach((m) => affected.add(m))
           }
-          return code
+
+          return [...affected, ...modules]
         },
       },
-    }),
-
-    transform: {
-      filter: { id: { include, exclude } },
-      handler: withMagicString(function (s, id) {
-        return transformMacros({
-          s,
-          id,
-          getRunner,
-          deps,
-          attrs: options.attrs,
-          virtualModules,
-          unpluginContext: this,
-        })
-      }),
-    },
-
-    vite: {
-      configureServer(server) {
-        if (options.viteServer === undefined) {
-          options.viteServer = server
-        }
-      },
-
-      handleHotUpdate({ file, server, modules }) {
-        if (!runner) return
-        const cache = runner.moduleCache
-        const mod = cache.get(file)
-        if (!mod) return
-
-        node.fetchCache.delete(file)
-        cache.invalidateModule(mod)
-
-        const affected = new Set<ModuleNode>()
-
-        for (const [id, macrosIds] of deps) {
-          if (!macrosIds.has(file)) continue
-          server.moduleGraph
-            .getModulesByFile(id)
-            ?.forEach((m) => affected.add(m))
-        }
-
-        return [...affected, ...modules]
-      },
-    },
-  }
-})
-export default plugin
+    }
+  })

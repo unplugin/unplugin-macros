@@ -1,1 +1,1 @@
-export { whatever } from './macros/var' with { type: 'macro' }
+export { whatever } from './macros/var.ts' with { type: 'macro' }

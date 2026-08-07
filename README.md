@@ -79,7 +79,7 @@ module.exports = {
 
 ```js
 // main.js
-import { buildTime, getRandom } from './macros' with { type: 'macro' }
+import { buildTime, getRandom } from './macros.js' with { type: 'macro' }
 
 getRandom() // Will be replaced with a random number at build time
 buildTime // Will be replaced with the timestamp at the build time
@@ -93,13 +93,17 @@ export function getRandom() {
 export const buildTime = Date.now()
 ```
 
+Macro specifiers are resolved by the [runner](#runners). The default runner follows
+Node.js' ESM resolution, so relative specifiers need their file extension —
+`'./macros.js'`, not `'./macros'`.
+
 ### Function Arguments
 
 You can pass function values as arguments to macros. Functions must be isolated (no references to outside identifiers):
 
 ```js
 // main.js
-import { transform } from './macros' with { type: 'macro' }
+import { transform } from './macros.js' with { type: 'macro' }
 
 transform(() => 42)
 transform(async () => {
@@ -152,6 +156,78 @@ Import Attributes syntax is supported in TypeScript 5.3 and above.
 ### ESLint
 
 Import Attributes syntax is supported in ESLint v9.14.0.
+
+## Runners
+
+A runner resolves and executes macro modules. Two are built in, and both resolve
+macro specifiers the same way — following Node.js' ESM resolution, so relative
+specifiers need their file extension (`'./macros.ts'`, not `'./macros'`).
+
+Editing a macro module — or anything it imports — invalidates it during dev.
+
+### `nativeRunner` (default)
+
+Runs macros on Node.js' native ESM loader. Nothing is bundled or transpiled
+ahead of time, which makes it the cheapest option, and it needs no extra
+dependency.
+
+TypeScript relies on Node's native type stripping, so:
+
+- non-erasable syntax (`enum`, `namespace`, parameter properties) is not
+  supported
+- macro modules published as `.ts` inside `node_modules` cannot be loaded
+- no aliases, `tsconfig` paths, JSX, or non-JS imports inside macro modules
+
+```ts
+import { nativeRunner } from 'unplugin-macros'
+import Macros from 'unplugin-macros/vite'
+
+Macros({ runner: nativeRunner() })
+```
+
+### `unrunRunner`
+
+Bundles each macro module with [unrun](https://github.com/Gugustinette/unrun)
+(Rolldown) before executing it, so everything Rolldown understands works: `enum`
+and other non-erasable TypeScript syntax, JSX, extensionless imports *inside* the
+macro module, `tsconfig` paths, and aliases or plugins via `inputOptions`.
+
+Requires `unrun` to be installed — it is an optional peer dependency.
+
+```ts
+import { unrunRunner } from 'unplugin-macros'
+import Macros from 'unplugin-macros/vite'
+
+Macros({
+  runner: unrunRunner({
+    inputOptions: { resolve: { alias: { '~': './src' } } },
+  }),
+})
+```
+
+### Custom runners
+
+Any object matching the `MacroRunner` interface works — this is the escape hatch
+for loaders such as `jiti` or `tsx`:
+
+```ts
+import path from 'node:path'
+import { createJiti } from 'jiti'
+import Macros from 'unplugin-macros/vite'
+
+const jiti = createJiti(import.meta.url)
+
+Macros({
+  runner: {
+    resolve: (source, importer) =>
+      jiti.esmResolve(source, { parentURL: path.dirname(importer) }),
+    import: (resolved) => jiti.import(resolved),
+  },
+})
+```
+
+`init` (called once, lazily, only when a macro is actually found), `invalidate`
+and `close` are optional.
 
 ## Options
 

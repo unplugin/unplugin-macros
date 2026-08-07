@@ -166,7 +166,7 @@ const __macro_export_3 = undefined;
 const __macro_export_4 = "default-value";
 const __macro_export_5 = 1;
 const __macro_export_6 = "omega-value";
-const __macro_export_7 = { "default": "default-value", "alpha": 1, "omega": "omega-value" };
+const __macro_export_7 = { "alpha": 1, "default": "default-value", "omega": "omega-value" };
 
 export { __macro_export_5 as alpha, __macro_export_4 as defaultValue, __macro_export_7 as exportedValues, __macro_export_2 as namedBar, __macro_export_1 as namedFoo, __macro_export_3 as namedUndefined, __macro_export_6 as omega };
 "

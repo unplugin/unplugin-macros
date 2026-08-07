@@ -1,3 +1,3 @@
-import { arg } from './macros/args' with { type: 'macro' }
+import { arg } from './macros/args.ts' with { type: 'macro' }
 
 arg(arg(10) + 1) === 11

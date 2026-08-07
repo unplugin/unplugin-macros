@@ -1,5 +1,6 @@
+import { nativeRunner } from '../runner/native.ts'
+import type { MacroRunner } from '../runner/index.ts'
 import type { FilterPattern } from 'unplugin'
-import type { InlineConfig, ViteDevServer } from 'vite'
 
 /**
  * Represents the options for the plugin.
@@ -18,19 +19,13 @@ export interface Options {
   exclude?: FilterPattern
 
   /**
-   * The Vite dev server instance.
+   * The runner that resolves and executes macro modules.
    *
-   * If not provided and the bundler is Vite, it will reuse the current dev server.
-   * If not provided, it will try to use `viteConfig` to create one.
+   * Defaults to `nativeRunner()`, which uses Node.js' native ESM loader.
+   * Use `unrunRunner()` to bundle macro modules with Rolldown first.
+   * @default nativeRunner()
    */
-  viteServer?: ViteDevServer | false
-
-  /**
-   * The Vite configuration.
-   * Available when `viteServer` is not provided.
-   * @see https://vitejs.dev/config/
-   */
-  viteConfig?: InlineConfig
+  runner?: MacroRunner
 
   /**
    * Adjusts the plugin order (only works for Vite and Webpack).
@@ -58,12 +53,8 @@ export interface Options {
 /**
  * Represents the resolved options for the plugin.
  */
-export type OptionsResolved = Omit<
-  Required<Options>,
-  'enforce' | 'viteServer'
-> & {
+export type OptionsResolved = Omit<Required<Options>, 'enforce'> & {
   enforce?: Options['enforce']
-  viteServer?: Options['viteServer']
 }
 
 /**
@@ -76,8 +67,7 @@ export function resolveOptions(options: Options): OptionsResolved {
   return {
     include: options.include || [/\.[cm]?[jt]sx?$/],
     exclude: options.exclude || [/node_modules/, /\.d\.[cm]?ts$/],
-    viteServer: options.viteServer,
-    viteConfig: options.viteConfig || {},
+    runner: options.runner || nativeRunner(),
     enforce: 'enforce' in options ? options.enforce : 'pre',
     attrs: options.attrs || { type: 'macro' },
     virtualModules: options.virtualModules ?? false,

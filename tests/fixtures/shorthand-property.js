@@ -1,4 +1,4 @@
-import { foo, _undefined, bar, baz } from './macros/var' with { type: 'macro' }
+import { foo, _undefined, bar, baz } from './macros/var.ts' with { type: 'macro' }
 
 const mixed = {
   ...{ existing: true },

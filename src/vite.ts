@@ -4,7 +4,7 @@
  * @module
  */
 
-import unplugin from './index.ts'
+import { Macros } from './index.ts'
 
 /**
  * Vite plugin
@@ -19,6 +19,6 @@ import unplugin from './index.ts'
  * })
  * ```
  */
-const vite = unplugin.vite as typeof unplugin.vite
+const vite = Macros.vite as typeof Macros.vite
 export default vite
 export { vite as 'module.exports' }

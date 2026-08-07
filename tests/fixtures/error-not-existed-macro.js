@@ -1,3 +1,3 @@
-import { whatever } from './macros/rand' with { type: 'macro' }
+import { whatever } from './macros/rand.js' with { type: 'macro' }
 
 whatever()

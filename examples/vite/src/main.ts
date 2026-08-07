@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 
-import { echo, getStartupTime, rand } from './macros' with { type: 'macro' }
+import { echo, getStartupTime, rand } from './macros.ts' with { type: 'macro' }
 
 console.log('Hello, world!')
 console.log('startup time', getStartupTime())
