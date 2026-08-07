@@ -14,9 +14,13 @@ import { resolveOptions, type Options } from './core/options.ts'
 import type { MacroRunner } from './runner/index.ts'
 import type { ModuleNode } from 'vite'
 
-export * from './core/define.ts'
-export * from './core/index.ts'
-export * from './core/options.ts'
+export { defineMacro } from './core/define.ts'
+export {
+  transformMacros,
+  type MacroContext,
+  type TransformContext,
+} from './core/index.ts'
+export { resolveOptions, type Options } from './core/options.ts'
 
 /**
  * The main unplugin instance.

@@ -24,7 +24,6 @@
   ],
   "exports": {
     ".": "./dist/index.mjs",
-    "./api": "./dist/api.mjs",
     "./esbuild": "./dist/esbuild.mjs",
     "./rolldown": "./dist/rolldown.mjs",
     "./rollup": "./dist/rollup.mjs",
@@ -83,6 +82,7 @@
     "rolldown": "^1.2.3",
     "tsdown": "^0.22.14",
     "tsdown-preset-sxzz": "^0.7.0",
+    "tsnapi": "^1.2.0",
     "typescript": "^6.0.3",
     "unrun": "^0.3.1",
     "vite": "^8.0.12",
