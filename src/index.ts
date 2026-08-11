@@ -21,6 +21,7 @@ export {
   type TransformContext,
 } from './core/index.ts'
 export { resolveOptions, type Options } from './core/options.ts'
+export * from './runner/index.ts';
 
 /**
  * The main unplugin instance.

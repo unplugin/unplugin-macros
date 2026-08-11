@@ -3,8 +3,11 @@
  */
 // #region Functions
 export function defineMacro(_) {}
+export function nativeRunner(_) {}
+export function resolveMacroPath(_, _) {}
 export function resolveOptions(_) {}
 export async function transformMacros(_) {}
+export function unrunRunner(_) {}
 // #endregion
 
 // #region Variables
