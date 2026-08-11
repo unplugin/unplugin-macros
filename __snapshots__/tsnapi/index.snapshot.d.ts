@@ -9,6 +9,16 @@ export interface MacroContext {
   ast: MacroAst;
   unpluginContext: UnpluginBuildContext & UnpluginContext;
 }
+export interface MacroRunner {
+  init?: () => Thenable<void>;
+  resolve: (_: string, _: string) => Thenable<string>;
+  import: (_: string) => Thenable<Record<string, unknown>>;
+  invalidate?: (_: string) => Thenable<Iterable<string> | undefined>;
+  close?: () => Thenable<void>;
+}
+export interface NativeRunnerOptions {
+  track?: boolean;
+}
 export interface Options {
   include?: FilterPattern;
   exclude?: FilterPattern;
@@ -28,12 +38,19 @@ export interface TransformContext {
 }
 // #endregion
 
+// #region Types
+export type UnrunRunnerOptions = Omit<Options, "path" | "preset">;
+// #endregion
+
 // #region Functions
 export declare function defineMacro<Args extends any[], Return>(_: (this: MacroContext, ..._: Args) => Return): (..._: Args) => Return;
-export declare function resolveOptions(_: Options): OptionsResolved;
+export declare function nativeRunner(_?: NativeRunnerOptions): MacroRunner;
+export declare function resolveMacroPath(_: string, _: string): string;
+export declare function resolveOptions(_: Options$1): OptionsResolved;
 export declare function transformMacros(_: TransformContext): Promise<void>;
+export declare function unrunRunner(_?: UnrunRunnerOptions): MacroRunner;
 // #endregion
 
 // #region Variables
-export declare const Macros: UnpluginInstance<Options | undefined, false>;
+export declare const Macros: UnpluginInstance<Options$1 | undefined, false>;
 // #endregion
