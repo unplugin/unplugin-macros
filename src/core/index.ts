@@ -2,7 +2,7 @@ import { hash } from 'node:crypto'
 import { isBuiltin } from 'node:module'
 import { MagicStringAST } from 'magic-string-ast'
 import { analyze, type Symbol as AnalyzerSymbol } from 'yuku-analyzer'
-import { is, literalValue, nameOf, walkAsync } from 'yuku-ast'
+import { is, isWrapper, literalValue, nameOf, walkAsync } from 'yuku-ast'
 import { resolveMemberChain } from './utils.ts'
 import type { MacroRunner } from '../runner/index.ts'
 import type { RolldownString } from 'rolldown-string'
@@ -25,18 +25,6 @@ const STATEMENT_LIST_TYPES: ReadonlySet<string> = new Set([
   'Program',
   'StaticBlock',
   'SwitchCase',
-])
-
-/**
- * The TypeScript-only nodes that still wrap a runtime expression, so the walk
- * has to descend into them. Every other `TS*` node is pure type syntax.
- */
-const TS_EXPRESSION_TYPES: ReadonlySet<string> = new Set([
-  'TSAsExpression',
-  'TSInstantiationExpression',
-  'TSNonNullExpression',
-  'TSSatisfiesExpression',
-  'TSTypeAssertion',
 ])
 
 /**
@@ -255,7 +243,7 @@ export async function transformMacros(
           return ctx.skip()
         }
 
-        if (node.type.startsWith('TS') && !TS_EXPRESSION_TYPES.has(node.type)) {
+        if (node.type.startsWith('TS') && !isWrapper(node)) {
           return ctx.skip()
         }
 
