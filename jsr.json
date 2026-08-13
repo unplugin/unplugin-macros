@@ -3,7 +3,6 @@
   "version": "0.23.2",
   "exports": {
     "./index": "./src/index.ts",
-    "./api": "./src/api.ts",
     "./esbuild": "./src/esbuild.ts",
     "./rollup": "./src/rollup.ts",
     "./rolldown": "./src/rolldown.ts",
