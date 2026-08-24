@@ -2,7 +2,7 @@
   "name": "unplugin-macros",
   "type": "module",
   "version": "0.23.2",
-  "packageManager": "pnpm@11.22.0",
+  "packageManager": "pnpm@11.23.0",
   "description": "Macros for bundlers.",
   "author": "Kevin Deng <sxzz@sxzz.moe>",
   "license": "MIT",
@@ -65,9 +65,9 @@
     "magic-string-ast": "^2.1.1",
     "rolldown-string": "^0.3.1",
     "unplugin": "^3.3.0",
-    "yuku-analyzer": "^0.8.7",
-    "yuku-ast": "^0.8.7",
-    "yuku-parser": "^0.8.7"
+    "yuku-analyzer": "^0.9.0",
+    "yuku-ast": "^0.9.0",
+    "yuku-parser": "^0.9.0"
   },
   "devDependencies": {
     "@sxzz/eslint-config": "^8.5.0",
