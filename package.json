@@ -5,7 +5,7 @@
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
-      "version": "12.5.0",
+      "version": "12.11.2",
       "onFail": "download"
     }
   },
@@ -72,9 +72,9 @@
     "magic-string-ast": "^2.1.1",
     "rolldown-string": "^0.3.1",
     "unplugin": "^3.3.0",
-    "yuku-analyzer": "^0.12.0",
-    "yuku-ast": "^0.12.0",
-    "yuku-parser": "^0.12.0"
+    "yuku-analyzer": "^0.18.0",
+    "yuku-ast": "^0.18.0",
+    "yuku-parser": "^0.18.0"
   },
   "devDependencies": {
     "@sxzz/eslint-config": "^8.5.0",
