@@ -111,10 +111,10 @@ export function nativeRunner(options: NativeRunnerOptions = {}): MacroRunner {
     close() {
       modules.clear()
       graphs.clear()
-      if (hooksAcquired) {
-        hooksAcquired = false
-        releaseHooks()
-      }
+
+      if (!hooksAcquired) return
+      hooksAcquired = false
+      releaseHooks()
     },
   }
 }

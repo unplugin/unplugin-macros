@@ -1,7 +1,7 @@
 import { hash } from 'node:crypto'
 import { isBuiltin } from 'node:module'
 import { MagicStringAST } from 'magic-string-ast'
-import { analyze, type Symbol as AnalyzerSymbol } from 'yuku-analyzer'
+import { analyze, type Binding } from 'yuku-analyzer'
 import { is, isWrapper, literalValue, nameOf, walkAsync } from 'yuku-ast'
 import { resolveMemberChain } from './utils.ts'
 import type { MacroRunner } from '../runner/index.ts'
@@ -226,9 +226,9 @@ export async function transformMacros(
   ): { id: string[]; binding: MacroBinding } | undefined {
     const chain = resolveMemberChain(node)
     if (!chain) return
-    const symbol = mod.referenceOf(chain.root)?.symbol
-    if (!symbol) return
-    const binding = imports.get(symbol)
+    const local = mod.referenceOf(chain.root)?.binding
+    if (!local) return
+    const binding = imports.get(local)
     if (!binding) return
     return { id: chain.id, binding }
   }
@@ -460,6 +460,7 @@ export async function transformMacros(
         await walkAsync(arg, {
           async enter(node, ctx) {
             const subMacro = macros.find((macro) => macro.node === node)
+            // eslint-disable-next-line unicorn/prefer-early-return
             if (subMacro) {
               skip.add(subMacro)
               const result = await executeMacro(subMacro, runner, id)
@@ -493,7 +494,7 @@ export async function transformMacros(
   }
 
   function recordImports() {
-    const imports = new Map<AnalyzerSymbol, MacroBinding>()
+    const imports = new Map<Binding, MacroBinding>()
     for (const node of program.body) {
       if (
         node.type !== 'ImportDeclaration' ||
@@ -505,8 +506,8 @@ export async function transformMacros(
 
       s.removeNode(node)
       for (const specifier of node.specifiers) {
-        const symbol = mod.symbolOf(specifier.local)
-        if (!symbol) continue
+        const binding = mod.bindingOf(specifier.local)
+        if (!binding) continue
 
         const imported =
           specifier.type === 'ImportDefaultSpecifier'
@@ -514,7 +515,7 @@ export async function transformMacros(
             : specifier.type === 'ImportNamespaceSpecifier'
               ? '*'
               : nameOf(specifier.imported)
-        imports.set(symbol, { source: node.source.value, imported })
+        imports.set(binding, { source: node.source.value, imported })
       }
     }
     return imports

@@ -2,13 +2,6 @@
   "name": "unplugin-macros",
   "type": "module",
   "version": "0.23.2",
-  "devEngines": {
-    "packageManager": {
-      "name": "pnpm",
-      "version": "12.5.0",
-      "onFail": "download"
-    }
-  },
   "description": "Macros for bundlers.",
   "author": "Kevin Deng <sxzz@sxzz.moe>",
   "license": "MIT",
@@ -48,13 +41,20 @@
   "engines": {
     "node": "^22.18.0 || ^24.11.0 || >=26.0.0"
   },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "12.11.2",
+      "onFail": "download"
+    }
+  },
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "pnpm run lint --fix",
     "build": "tsdown",
     "dev": "tsdown --watch",
     "test": "vitest",
-    "typecheck": "tsgo --noEmit",
+    "typecheck": "tsc --noEmit",
     "format": "prettier --cache --write .",
     "release": "bumpp",
     "prepublishOnly": "pnpm run build"
@@ -68,32 +68,32 @@
     }
   },
   "dependencies": {
-    "import-without-cache": "^0.4.0",
+    "import-without-cache": "^0.4.1",
     "magic-string-ast": "^2.1.1",
     "rolldown-string": "^0.3.1",
-    "unplugin": "^3.3.0",
-    "yuku-analyzer": "^0.12.0",
-    "yuku-ast": "^0.12.0",
-    "yuku-parser": "^0.12.0"
+    "unplugin": "^3.4.0",
+    "yuku-analyzer": "^0.19.0",
+    "yuku-ast": "^0.19.0",
+    "yuku-parser": "^0.19.0"
   },
   "devDependencies": {
-    "@sxzz/eslint-config": "^8.5.0",
-    "@sxzz/prettier-config": "^2.3.2",
-    "@sxzz/test-utils": "^0.5.18",
-    "@types/node": "^26.2.0",
-    "@typescript/native-preview": "7.0.0-dev.20260707.2",
-    "bumpp": "^12.2.1",
+    "@sxzz/eslint-config": "^8.7.0",
+    "@sxzz/prettier-config": "^2.3.3",
+    "@sxzz/test-utils": "^0.5.19",
+    "@types/node": "^26.6.5",
+    "@typescript/native-preview": "npm:typescript@7.0.2",
+    "bumpp": "^12.3.0",
     "dedent": "^1.7.2",
-    "eslint": "^10.8.1",
-    "prettier": "^3.9.6",
-    "rolldown": "^1.2.4",
-    "tsdown": "^0.23.0",
-    "tsdown-preset-sxzz": "^0.7.0",
-    "tsnapi": "^1.2.0",
+    "eslint": "^10.12.0",
+    "prettier": "^3.9.10",
+    "rolldown": "^1.2.13",
+    "tsdown": "^0.23.1",
+    "tsdown-preset-sxzz": "^0.7.1",
+    "tsnapi": "^1.5.0",
     "typescript": "^6.0.3",
     "unrun": "^0.3.1",
     "vite": "^8.0.12",
-    "vitest": "^5.0.0"
+    "vitest": "^5.0.3"
   },
   "prettier": "@sxzz/prettier-config"
 }
