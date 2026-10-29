@@ -1,7 +1,7 @@
 {
   "name": "unplugin-macros",
   "type": "module",
-  "version": "0.23.3",
+  "version": "0.23.4",
   "description": "Macros for bundlers.",
   "author": "Kevin Deng <sxzz@sxzz.moe>",
   "license": "MIT",
