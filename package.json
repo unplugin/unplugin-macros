@@ -60,10 +60,14 @@
     "prepublishOnly": "pnpm run build"
   },
   "peerDependencies": {
-    "unrun": "^0.3.1"
+    "unrun": "^0.3.1",
+    "vitest": "^5.0.0"
   },
   "peerDependenciesMeta": {
     "unrun": {
+      "optional": true
+    },
+    "vitest": {
       "optional": true
     }
   },

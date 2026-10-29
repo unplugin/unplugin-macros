@@ -31,3 +31,25 @@ export function resolveMemberChain(
   id.unshift(current.name)
   return { root: current, id }
 }
+
+function escapeRegExp(str: string): string {
+  return str.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`)
+}
+
+/**
+ * Cheaply checks whether the source may import a macro, i.e. whether every
+ * expected import attribute appears as a `key: 'value'` pair. It may report
+ * false positives, but never misses a macro import.
+ */
+export function mayContainMacros(
+  source: string,
+  attrs: Record<string, string>,
+): boolean {
+  return Object.entries(attrs).every(([key, value]) => {
+    const k = escapeRegExp(key)
+    const v = escapeRegExp(value)
+    return new RegExp(
+      String.raw`(?:(?<![\w$])${k}(?![\w$])|(['"])${k}\1)\s*:\s*(['"])${v}\2`,
+    ).test(source)
+  })
+}
