@@ -11,8 +11,10 @@ import {
   VIRTUAL_ID_PREFIX,
 } from './core/index.ts'
 import { resolveOptions, type Options } from './core/options.ts'
+import { mayContainMacros } from './core/utils.ts'
 import type { MacroRunner } from './runner/index.ts'
 import type { ModuleNode } from 'vite'
+import type { VitestPluginContext } from 'vitest/node'
 
 export { defineMacro } from './core/define.ts'
 export {
@@ -112,6 +114,15 @@ export const Macros: UnpluginInstance<Options | undefined, false> =
           }
 
           return [...affected, ...modules]
+        },
+
+        // Vitest's fs module cache is keyed by the module's own source, so it
+        // can't see changes in macros or in files they read. Opt modules
+        // that may import macros out of the cache.
+        configureVitest({ defineCacheKeyGenerator }: VitestPluginContext) {
+          defineCacheKeyGenerator?.(({ sourceCode }) => {
+            if (mayContainMacros(sourceCode, options.attrs)) return false
+          })
         },
       },
     }
