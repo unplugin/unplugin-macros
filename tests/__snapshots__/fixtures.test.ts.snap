@@ -161,6 +161,24 @@ var TestCls = class {
 "
 `;
 
+exports[`fixture > fixtures/parenthesize.js 1`] = `
+"// parenthesize.js
+const fixed = 3 .toFixed(1);
+const negated = - -1;
+const signed = +-1;
+const power = (-1) ** 2;
+const getDefaults = () => ({ "mode": "prod" });
+const negative = (-1).toString();
+const minus = 5 - -1;
+const plus = 5 + -1;
+let total = 0;
+[1, 2].forEach((n) => total += n);
+-1 === -1;
+/a/g.test("a");
+
+export { fixed, getDefaults, minus, negated, negative, plus, power, signed };"
+`;
+
 exports[`fixture > fixtures/promise.js 1`] = `
 "// promise.js
 const a = "ok";

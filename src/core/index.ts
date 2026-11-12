@@ -188,12 +188,26 @@ export async function transformMacros(
   }
 
   /**
-   * An object literal at the head of an expression statement parses as a
-   * block, so a macro inlined there has to be parenthesized: `macro().foo`
-   * -> `({ ... }).foo`.
+   * Parenthesizes an inlined value where it would otherwise parse
+   * differently:
+   *
+   * - as the object of a member expression: `3.toFixed()` is invalid and
+   *   `-1 .toFixed()` negates the result -> `(3).toFixed()`
+   * - after a unary or binary `+`/`-`, or before `**`: `-offset()` -> `-(-1)`,
+   *   `x-offset()` -> `x-(-1)`
+   * - as a concise arrow body: `() => macro()` -> `() => ({ ... })`
+   * - at the head of an expression statement, see below.
    */
   function parenthesize(macro: Macro, value: string): string {
-    if (!value.startsWith('{')) return value
+    const parent = mod.parentOf(macro.node)
+    if (parent && needsParens(parent, macro.node, value)) {
+      return `(${value})`
+    }
+
+    // An object literal at the head of an expression statement parses as a
+    // block, and a value starting with `[`, `(`, `-`, `/`, ... continues the
+    // previous line through ASI: `macro().foo` -> `({ ... }).foo`.
+    if (!/^[{[(+\-/`]/.test(value)) return value
 
     // Walk up while the ancestor still begins at the macro, i.e. while the
     // macro is the leftmost token of the enclosing expression.
@@ -572,6 +586,32 @@ function overwriteMacro(s: MagicStringAST, macro: Macro, value: string) {
     s.overwriteNode(macro.node, `${parent.key.name}: ${value}`)
   } else {
     s.overwriteNode(macro.node, value)
+  }
+}
+
+/**
+ * Whether `value`, written over `node`, binds differently to `parent` than
+ * the original node did.
+ */
+function needsParens(parent: Node, node: Node, value: string): boolean {
+  const signed = value.startsWith('-') || value.startsWith('+')
+  switch (parent.type) {
+    case 'MemberExpression':
+      return parent.object === node && (signed || /^\d+$/.test(value))
+    case 'UnaryExpression':
+      return signed
+    case 'BinaryExpression':
+      // `x-macro()` -> `x--1` is a syntax error
+      return (
+        signed &&
+        ((parent.operator === '**' && parent.left === node) ||
+          ((parent.operator === '-' || parent.operator === '+') &&
+            parent.right === node))
+      )
+    case 'ArrowFunctionExpression':
+      return parent.body === node && value.startsWith('{')
+    default:
+      return false
   }
 }
 
