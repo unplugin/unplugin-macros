@@ -552,6 +552,13 @@ export async function transformMacros(
     if (type === '[object Date]') {
       return `new Date(${(value as Date).getTime()})`
     }
+    // JSON.stringify turns NaN and ±Infinity into `null`, and -0 into `0`.
+    if (Object.is(value, -0)) {
+      return '-0'
+    }
+    if (ty === 'number' && !Number.isFinite(value)) {
+      return String(value)
+    }
     return JSON.stringify(value)
   }
 }

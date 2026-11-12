@@ -161,6 +161,26 @@ var TestCls = class {
 "
 `;
 
+exports[`fixture > fixtures/number.js 1`] = `
+"// number.js
+const isInf = Infinity === Infinity;
+const isNegInf = -Infinity === -Infinity;
+const isNotANumber = Number.isNaN(NaN);
+const isNegZero = Object.is(-0, -0);
+const values = [
+	Infinity,
+	NaN,
+	-0
+];
+const object = {
+	"inf": Infinity,
+	"nan": NaN,
+	"zero": -0
+};
+
+export { isInf, isNegInf, isNegZero, isNotANumber, object, values };"
+`;
+
 exports[`fixture > fixtures/promise.js 1`] = `
 "// promise.js
 const a = "ok";
